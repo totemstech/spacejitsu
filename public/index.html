@@ -1,0 +1,64 @@
+<!doctype HTML>
+<html>
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">    
+    
+    <!-- LIB SCRIPTS -->
+    <script type="text/javascript" src="/lib/jquery.min.js"></script>
+    <script type="text/javascript" src="/lib/Three.js"></script>
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script> <!-- served through socket.io route -->
+
+    <!-- SCRIPTS -->    
+    <script type="text/javascript" src="/js/util.js"></script>
+    <script type="text/javascript" src="/js/world.js"></script>
+
+    
+
+    <script>
+      window.onload = function () {
+        // Connect to socket.io
+        var socket = io.connect('/');
+      
+        // React to a received message
+        socket.on('ping', function (data) {
+
+          // Modify the DOM to show the message
+          //document.getElementById("msg").innerHTML = data.msg;
+
+          // Send a message back to the server
+          socket.emit('pong', {
+            msg: "The web browser also knows socket.io."
+          });      
+        });  
+
+        var w = world({container: 'world'});
+        w.init();
+        w.render();
+      };
+    </script>
+
+
+    <style>
+      body {
+        background-color: #000000;
+        margin: 0px;
+        overflow: hidden;
+      }
+      
+      #world {
+        //border: 1px solid white;
+        width:1200px; 
+        height:800px;
+      }
+      </style>
+  </head>
+
+
+  <body>    
+    <center>
+      <div id="world" style=""></div>
+    </center>
+  </body>
+</html>
