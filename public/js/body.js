@@ -24,7 +24,7 @@ var body = function(spec, my) {
     var applyBP;        /* apply({x, y}, {x, y}); */
     var integrate;      /* integrate(duration); */
 
-    var that = particle({spec, my});
+    var that = particle(spec, my);
     
     /** 
      * applies the force f and torque t to the obj
@@ -55,8 +55,8 @@ var body = function(spec, my) {
      * @param pt {x,y} world point
      */
     applyBP = function(f, pt) {
-	var p { x: pt.x * Math.cos(my.rotation) - pt.y * Math.sin(my.rotation),
-		y: pt.y * Math.sin(my.rotation) + pt.x * Math.cos(my.rotation) };
+	var p = { x: pt.x * Math.cos(my.rotation) - pt.y * Math.sin(my.rotation),
+		  y: pt.y * Math.sin(my.rotation) + pt.x * Math.cos(my.rotation) };
 	applyWP(f, pt);
     };
     
@@ -65,16 +65,22 @@ var body = function(spec, my) {
      * @param d duration
      */
     integrate = function(d) {
-	my.rotation += my.torque * my.invinertia * duration;
+	my.rotation += my.torque * my.invinertia * d;
 	// TOOD: add dampling if necessary
-	my.orientation += my.rotation * duration;
+	my.orientation += my.rotation * d;
 
 	_super.integrate();
     };
     
 
-    that.method(that, 'integrate', integrate, _super);
-    that.method(that, 'apply', apply, _super);
+    method(that, 'integrate', integrate, _super);
+    method(that, 'apply', apply, _super);
+    method(that, 'applyWP', applyWP, _super);
+    method(that, 'applyBP', applyWP, _super);
+
+    getter(that, 'invinertia', my, 'invinertia');
+    getter(that, 'orientation', my, 'orientation');
+    getter(that, 'rotation', my, 'rotation');
 
     return that;
 };

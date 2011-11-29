@@ -37,12 +37,16 @@ var particle = function(spec, my) {
      * @param d duration
      */
     integrate = function(d) {
-	my.velocity.x += my.force.x * my.invmass * duration;
-	my.velocity.y += my.force.y * my.invmass * duration;	
-	// TOOD: add dampling if necessary
-	my.position.x += my.velocity.x * duration;
-	my.position.y += my.velocity.y * duration;	
+	console.log(JSON.stringify(my.force));
+	console.log(JSON.stringify(my.velocity));
+	console.log(JSON.stringify(my.position));
 
+	my.velocity.x += my.force.x * my.invmass * d;
+	my.velocity.y += my.force.y * my.invmass * d;	
+	// TOOD: add dampling if necessary
+	my.position.x += my.velocity.x * d;
+	my.position.y += my.velocity.y * d;	
+	
 	my.force = { x: 0, y: 0 };
     };
 
