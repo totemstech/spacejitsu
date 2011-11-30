@@ -7,7 +7,7 @@ var config = {
     HALFSIZE_Y: 1000,
 
     STEP_TIME: 15,
-    GM: 50,
+    GM: 30,
     
     EARTH_RADIUS: 150,
 
@@ -18,9 +18,14 @@ var config = {
     SNAP_THRESHOLD: 0.05,
 
     RENDER_TIME: 15,
-    
-    DEFAULT_THRUST: { push: 0.003, rot: 0.005 },
-    DEFAULT_TYPE: 'default',
+    UPDATE_TIME: 500,
+
+    DEFAULT_THRUST: { push: 0.002, rot: 0.005 },
+    DEFAULT_MODEL: 'nomodel',
+
+    PARTICLE_TYPE: 'particle',
+    BODY_TYPE: 'body',
+    SHIP_TYPE: 'ship',
     
     INPUT_UP: 'u',
     INPUT_DOWN: 'd',

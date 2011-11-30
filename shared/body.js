@@ -16,7 +16,7 @@ if(typeof particle === 'undefined')
  *
  * @extends {}
  * 
- * @param spec {id, invmass, invinertia, 
+ * @param spec {id, owner, invmass, invinertia, 
  *              position, orientation,
  *              velocity, rotation,
  *              radius}
@@ -25,6 +25,8 @@ var body = function(spec, my) {
     var my = my || {};
     var _super = {};
     
+    spec.type = spec.type || config.BODY_TYPE;
+
     my.invinertia = spec.invinertia || 0;
     my.orientation = spec.orientation || 0;
     my.rotation = spec.rotation || 0;

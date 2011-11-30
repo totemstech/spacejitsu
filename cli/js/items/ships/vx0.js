@@ -12,7 +12,7 @@ var vx0 = function(spec, my) {
     var my = my || {};
     var _super = {};
 
-    spec.type = 'vx0';
+    spec.model = spec.model || 'vx0';
 
     // public
     var draw;    /* draw(scene) */

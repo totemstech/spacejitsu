@@ -13,12 +13,15 @@ if(typeof config === 'undefined')
  *
  * @extends {}
  * 
- * @param spec {id, invmass, position, velocity, radius}
+ * @param spec {id, owner, type, invmass, position, velocity, radius}
  */
 var particle = function(spec, my) {
     var my = my || {};
 
     my.id = spec.id || 'invalid';
+    my.owner = spec.owner || 'nobody';
+    my.type = spec.type || config.PARTICLE_TYPE;
+
     my.invmass = spec.invmass || 0;    
     my.radius = spec.radius || 0;  // collision detection
 
@@ -66,7 +69,10 @@ var particle = function(spec, my) {
      * returns the description of the particle
      */
     desc = function() {
-	return { invmass: my.invmass,
+	return { id: my.id,
+		 owner: my.owner,
+		 type: my.type,
+	         invmass: my.invmass,		 
 		 radius: my.radius,
 		 position: my.position,
 		 velocity: my.velocity };		 
@@ -85,9 +91,12 @@ var particle = function(spec, my) {
      * @param state {p, v}
      */
     update = function(s) {
-	if(typeof s.p !== 'undefined') my.position = s.p;
-	if(typeof s.v !== 'undefined') my.velocity = s.v;
-	// TODO: slow update
+	if(typeof s.p !== 'undefined') {
+	    my.position.x = 8/10 * my.position.x + 2/10 * s.p.x;
+	    my.position.y = 8/10 * my.position.y + 2/10 * s.p.y;
+	}
+	my.velocity.x = s.v.x;
+	my.velocity.y = s.v.y;
     };
 
     method(that, 'integrate', integrate);
@@ -98,6 +107,9 @@ var particle = function(spec, my) {
     method(that, 'update', update);
     
     getter(that, 'id', my, 'id');
+    getter(that, 'owner', my, 'owner');
+    getter(that, 'type', my, 'type');
+
     getter(that, 'invmass', my, 'invmass');
     getter(that, 'radius', my, 'radius');
     getter(that, 'position', my, 'position');

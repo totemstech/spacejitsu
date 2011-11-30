@@ -17,6 +17,24 @@ io.of('/game').on('connection', function(socket) {
 	socket.set('id', id, function() {
 		socket.emit('init', { id : id });		
 	    });	
+	
+	socket.on('push', function(data) {
+		socket.get('id', function(err, id) {
+			if(!err) {
+			    game.push(id, data.id, data.state);
+			    io.of('/game').volatile.emit('push', {state: data.state, id: data.id, src: id});
+			}
+		    });
+	    });
+
+	socket.on('create', function(data) {
+		socket.get('id', function(err, id) {
+			if(!err) {
+			    game.create(id, data.desc);
+			    io.of('/game').emit('create', {desc: data.desc, src: id});
+			}
+		    });
+	    });
     });
 
 

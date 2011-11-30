@@ -16,17 +16,19 @@ if(typeof body === 'undefined')
  *
  * @extends obj
  * 
- * @param spec {id, invmass, invinertia, 
+ * @param spec {id, owner, type, model,
+ *              invmass, invinertia, 
  *              position, orientation,
  *              velocity, rotation,
- *              radius, thrust, type}
+ *              radius, thrust}
  */
 var ship = function(spec, my) {
     var my = my || {};
     var _super = {};        
     
+    spec.type = spec.type || config.SHIP_TYPE;
     my.thrust = spec.thrust || config.DEFAULT_THRUST;
-    my.type = spec.type || config.DEFAULT_TYPE;
+    my.model = spec.model || config.DEFAULT_MODEL;
 
     my.inputs = [];    
 
@@ -94,7 +96,7 @@ var ship = function(spec, my) {
     desc = function() {
 	var d = _super.desc();
 	d.thrust = my.thrust;
-	d.type = my.type;
+	d.model = my.model;
 	return d;
     };
 
@@ -113,7 +115,7 @@ var ship = function(spec, my) {
      */
     update = function(s) {
 	_super.update(s);
-	if(typeof s.i === 'undefined') my.inputs = s.i;
+	if(typeof s.i !== 'undefined') my.inputs = s.i;
     };
 
 
@@ -126,6 +128,9 @@ var ship = function(spec, my) {
     method(that, 'thrust', thrust);
 
     getter(that, 'inputs', my, 'inputs');
+    getter(that, 'model', my, 'model');
 
     return that;
 };
+
+exports.ship = ship;

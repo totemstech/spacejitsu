@@ -97,6 +97,9 @@ var world = function(spec, my) {
     method(that, 'add', add);
     method(that, 'remove', remove);
 
+    getter(that, 'idx', my, 'idx');
+    getter(that, 'all', my, 'all');
+
     return that;
 };
 

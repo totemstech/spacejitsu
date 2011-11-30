@@ -12,10 +12,9 @@ var game = function(spec, my) {
 
     my.container = spec.container;
 
-    my.all = [];
-
     my.ship = undefined;
     my.rockets = undefined;
+    my.incr = 0;
 
     // public
     var start;       /* start(); */
@@ -29,6 +28,7 @@ var game = function(spec, my) {
     // private
     var render; /* render(); */
     var push;   /* push() */
+    var gid;    /* gid() */
 
     var that = world(spec, my);
 
@@ -37,8 +37,9 @@ var game = function(spec, my) {
      */
     push = function() {
 	if(typeof my.ship !== 'undefined') {
-	    console.log('pushing: ' + JSON.stringify(my.ship.state()));
-	    my.socket.emit('push', my.ship.state());
+	    //console.log('pushing: ' + JSON.stringify(my.ship.state()));
+	    my.socket.emit('push', { id: my.ship.id(), 
+			             state: my.ship.state() });
 	}	
     };
     
@@ -107,18 +108,8 @@ var game = function(spec, my) {
 	my.spacegrid.draw(my.scene);
 	// earth
 	my.earth = earth({});
+	that.add(my.earth);
 	my.earth.draw(my.scene);
-
-	my.ship = vx0( {invmass: 0.2,
-			invinertia: 2.002,
-			radius: 15,
-			position: {x: (400) * Math.cos(Math.PI/100),
-				   y: (400) * Math.sin(Math.PI/100) },
-			velocity: {x: 0.3 * Math.sin(Math.PI/100),
-				   y: 0.3 * Math.cos(Math.PI/100) } });
-	that.add(my.ship);
-	my.all.push(my.ship);
-	my.ship.draw(my.scene);
 
 	//my.renderer = new THREE.CanvasRenderer();
 	my.renderer = new THREE.WebGLRenderer();
@@ -130,21 +121,49 @@ var game = function(spec, my) {
 	
 	my.rtimer = setInterval(render, config.RENDER_TIME);
 	my.gtimer = setInterval(step, config.STEP_TIME);
+	// TODO: put server side
+	my.utimer = setInterval(push, config.UPDATE_TIME);
 
-	my.socket = io.connect('/game');
-	
 	/** distributed simulation interface */
+	
+	my.socket = io.connect('/game');
 	
 	my.socket.on('init', function(data) {
 		my.id = data.id;
-		console.log('received id: ' + my.id);
-		// data.client_id
+		// ship buildup
+		my.ship = vx0( { id: gid(),
+			         owner: my.id,
+				 invmass: 0.2,				
+				 invinertia: 2.002,
+				 radius: 15,
+				 position: {x: (400) * Math.cos(Math.PI/100),
+					    y: (400) * Math.sin(Math.PI/100) },
+				 velocity: {x: 0.3 * Math.sin(Math.PI/100),
+					    y: 0.3 * Math.cos(Math.PI/100) } });
+		that.add(my.ship);
+		my.ship.draw(my.scene);
+
+		my.socket.emit('create', { desc: my.ship.desc() });
 	    });	
+
 	my.socket.on('create', function(data) {
-		// data.desc
+		if(data.src !== my.id) {
+		    if(data.desc.type === config.SHIP_TYPE) {
+			switch(data.desc.model) {
+			  case 'vx0':
+			    var s = vx0(data.desc);
+			    that.add(s);
+			    s.draw(my.scene);			    
+			    break;
+			default:
+			}
+		    }		    
+		}
 	    });		
-	my.socket.on('state', function(data) {
-		// [state]
+	my.socket.on('push', function(data) {
+		if(that.idx()[data.id] !== 'undefined') {
+		    that.idx()[data.id].update(data.state);
+		}
 	    });	
 	my.socket.on('delete', function(data) {
 		// [ids]
@@ -152,7 +171,6 @@ var game = function(spec, my) {
 	my.socket.on('explode', function(data) {
 		// [ids]
 	    });
-
     };
    
     /**
@@ -167,13 +185,12 @@ var game = function(spec, my) {
 	delete my.rtimer;
     };
 
-
     /**
      * renders the current scene
      */
     render = function() {
-	for(var i = 0; i < my.all.length; i ++) {
-	    my.all[i].render();
+	for(var i = 0; i < that.all().length; i ++) {
+	    that.all()[i].render();
 	} 
 	my.renderer.render(my.scene, my.camera);
     };
@@ -182,9 +199,24 @@ var game = function(spec, my) {
      * steps the engine
      */
     step = function() {
-	my.ship.thrust();
+	for(var i = 0; i < that.all().length; i ++) {
+	    //console.log(that.all()[i].id() + ' ' + that.all()[i].type());
+	    if(that.all()[i].type() === config.SHIP_TYPE) {
+		//console.log(that.all()[i].id() + ' ' + that.all()[i].inputs());
+		that.all()[i].thrust();
+	    }
+	}
 	_super.step();
     }
+
+    /**
+     * returns a global id based on local id
+     * and an incremented integer
+     * @return gid a global id
+     */
+    gid = function() {
+	return my.id + '-' + (++my.incr);
+    };
 
     method(that, 'start', start, _super);
     method(that, 'stop', stop, _super);
