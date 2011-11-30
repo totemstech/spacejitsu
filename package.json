@@ -2,7 +2,7 @@
   "name": "nodeapps-socket.io",
   "author": "Nodejitsu Inc. <support@nodejitsu.com>",
   "scripts": {
-    "start": "./bin/server"
+    "start": "./srv/app.js"
   },
   "version": "0.1.0-1",
   "dependencies": {

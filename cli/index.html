@@ -15,35 +15,28 @@
     <script type="text/javascript" src="/shared/config.js"></script>
     <script type="text/javascript" src="/shared/particle.js"></script>
     <script type="text/javascript" src="/shared/body.js"></script>
+    <script type="text/javascript" src="/shared/ship.js"></script>
+    <script type="text/javascript" src="/shared/world.js"></script>
 
     <!-- SCRIPTS -->    
-    <script type="text/javascript" src="/js/obj.js"></script>
     <script type="text/javascript" src="/js/items/spacegrid.js"></script>
     <script type="text/javascript" src="/js/items/earth.js"></script>
-    <script type="text/javascript" src="/js/items/ship.js"></script>
-    <script type="text/javascript" src="/js/world.js"></script>
+    <script type="text/javascript" src="/js/items/ships/vx0.js"></script>
+    <script type="text/javascript" src="/js/game.js"></script>
 
     
-
     <script>
       window.onload = function () {
-        // Connect to socket.io
-        var socket = io.connect('/');
-      
-        // React to a received message
-        socket.on('ping', function (data) {
+        var g = game({container: 'world'});
 
-          // Modify the DOM to show the message
-          //document.getElementById("msg").innerHTML = data.msg;
+        $(document).keydown(function(evt) {
+          g.keydown(evt);          
+        });
+        $(document).keyup(function(evt) {
+          g.keyup(evt);
+        });
 
-          // Send a message back to the server
-          socket.emit('pong', {
-            msg: "The web browser also knows socket.io."
-          });      
-        });  
-
-        var w = world({container: 'world'});
-        w.init();
+        g.start();
       };
     </script>
 

@@ -13,15 +13,17 @@ if(typeof config === 'undefined')
  *
  * @extends {}
  * 
- * @param spec {invmass, position, velocity, radius}
+ * @param spec {id, invmass, position, velocity, radius}
  */
 var particle = function(spec, my) {
     var my = my || {};
 
+    my.id = spec.id || 'invalid';
     my.invmass = spec.invmass || 0;    
+    my.radius = spec.radius || 0;  // collision detection
+
     my.position = spec.position || { x: 0, y:0 };
     my.velocity = spec.velocity || { x: 0, y:0 };
-    my.radius = spec.radius || 0;  // collision detection
 
     my.force = { x: 0, y: 0 };
 
@@ -29,6 +31,7 @@ var particle = function(spec, my) {
     var apply;      /* apply({x, y}); */
     var integrate;  /* integrate(duration); */
 
+    var desc;       /* desc() */
     var state;      /* state() */
     var update;     /* update(state) */
 
@@ -60,6 +63,16 @@ var particle = function(spec, my) {
     };
 
     /**
+     * returns the description of the particle
+     */
+    desc = function() {
+	return { invmass: my.invmass,
+		 radius: my.radius,
+		 position: my.position,
+		 velocity: my.velocity };		 
+    };
+
+    /**
      * returns the state of the particle
      */
     state = function() {
@@ -72,27 +85,29 @@ var particle = function(spec, my) {
      * @param state {p, v}
      */
     update = function(s) {
-	my.position = s.p;
-	my.velocity = s.v;
+	if(typeof s.p !== 'undefined') my.position = s.p;
+	if(typeof s.v !== 'undefined') my.velocity = s.v;
 	// TODO: slow update
     };
 
     method(that, 'integrate', integrate);
     method(that, 'apply', apply);
 
+    method(that, 'desc', desc);
     method(that, 'state', state);
     method(that, 'update', update);
     
-    getter(that, 'position', my, 'position');
-    getter(that, 'velocity', my, 'velocity');
+    getter(that, 'id', my, 'id');
     getter(that, 'invmass', my, 'invmass');
     getter(that, 'radius', my, 'radius');
+    getter(that, 'position', my, 'position');
+    getter(that, 'velocity', my, 'velocity');
     getter(that, 'force', my, 'force');
 
-    setter(that, 'position', my, 'position');
-    setter(that, 'velocity', my, 'velocity');
     setter(that, 'invmass', my, 'invmass');
     setter(that, 'radius', my, 'radius');
+    setter(that, 'position', my, 'position');
+    setter(that, 'velocity', my, 'velocity');
     setter(that, 'force', my, 'force');
 
     return that;

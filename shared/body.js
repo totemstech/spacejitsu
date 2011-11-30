@@ -5,6 +5,9 @@ if(typeof getter === 'undefined')
 if(typeof setter === 'undefined')
     var setter = require('./base.js').setter;
 
+if(typeof config === 'undefined')
+    var config = require('./config.js').config;
+
 if(typeof particle === 'undefined')
     var particle = require('./particle.js').particle;
 
@@ -13,7 +16,7 @@ if(typeof particle === 'undefined')
  *
  * @extends {}
  * 
- * @param spec {invmass, invinertia, 
+ * @param spec {id, invmass, invinertia, 
  *              position, orientation,
  *              velocity, rotation,
  *              radius}
@@ -34,6 +37,7 @@ var body = function(spec, my) {
     var applyBP;        /* apply({x, y}, {x, y}); */
     var integrate;      /* integrate(duration); */
 
+    var desc;       /* desc() */
     var state;      /* state() */
     var update;     /* update(state) */
 
@@ -67,10 +71,12 @@ var body = function(spec, my) {
      * @param f {x, y} force
      * @param pt {x,y} world point
      */
-    applyBP = function(f, pt) {
-	var p = { x: pt.x * Math.cos(my.rotation) - pt.y * Math.sin(my.rotation),
-		  y: pt.y * Math.sin(my.rotation) + pt.x * Math.cos(my.rotation) };
-	applyWP(f, pt);
+    applyBP = function(f, pt) {	
+	var p = { x: my.position.x + pt.x * Math.cos(my.rotation) - pt.y * Math.sin(my.orientation),
+		  y: my.position.y + pt.x * Math.sin(my.rotation) + pt.y * Math.cos(my.orientation) };
+	var ft = { x: f.x * Math.cos(my.orientation) - f.y * Math.sin(my.orientation),
+		   y: f.x * Math.sin(my.orientation) + f.y * Math.cos(my.orientation) };
+	applyWP(ft, p);
     };
     
     /** 
@@ -84,6 +90,17 @@ var body = function(spec, my) {
 
 	my.torque = 0;
 	_super.integrate(d);
+    };
+
+    /**
+     * returns the description of the body
+     */
+    desc = function() {
+	var d = _super.desc();
+	d.invinertia = my.invinertia;
+	d.orientation = my.orientation;
+	d.rotation = my.rotation;
+	return d;
     };
 
     /**
@@ -102,8 +119,8 @@ var body = function(spec, my) {
      */
     update = function(s) {
 	_super.update(s);
-	my.orientation = s.o;
-	my.rotation = s.r;
+	if(typeof s.o !== 'undefined') my.orientation = s.o;
+	if(typeof s.r !== 'undefined') my.rotation = s.r;
 	// TODO: slow update
     };
     
@@ -111,8 +128,9 @@ var body = function(spec, my) {
     method(that, 'integrate', integrate, _super);
     method(that, 'apply', apply, _super);
     method(that, 'applyWP', applyWP, _super);
-    method(that, 'applyBP', applyWP, _super);
+    method(that, 'applyBP', applyBP, _super);
 
+    method(that, 'desc', desc, _super);
     method(that, 'state', state, _super);
     method(that, 'update', update, _super);
 

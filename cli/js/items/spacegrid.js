@@ -13,9 +13,10 @@ var spacegrid = function(spec, my) {
     spec.invinertia = 0; // does not move   
 
     // public
-    var draw;      /* draw(scene); */
+    var draw;    /* draw(scene); */
+    var render;  /* render() */
 
-    var that = obj(spec, my);
+    var that = body(spec, my);
 
     draw = function(scene) {
 	// x-lines
@@ -39,7 +40,14 @@ var spacegrid = function(spec, my) {
 	    scene.add(line);
 	}
     };
-    
+
+    /**
+     * renders the object (step)
+     */
+    render = function() {
+    }
+
+    method(that, 'render', render);    
     method(that, 'draw', draw, _super);
 
     return that;
