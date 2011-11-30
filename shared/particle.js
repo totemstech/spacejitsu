@@ -1,3 +1,13 @@
+if(typeof method === 'undefined')
+    var method = require('./base.js').method;
+if(typeof getter === 'undefined')
+    var getter = require('./base.js').getter;
+if(typeof setter === 'undefined')
+    var setter = require('./base.js').setter;
+if(typeof config === 'undefined')
+    var config = require('./config.js').config;
+
+
 /**
  * Particle Object
  *
@@ -18,7 +28,10 @@ var particle = function(spec, my) {
     // public
     var apply;      /* apply({x, y}); */
     var integrate;  /* integrate(duration); */
-    
+
+    var state;      /* state() */
+    var update;     /* update(state) */
+
     var that = {};
 
     /** 
@@ -37,10 +50,6 @@ var particle = function(spec, my) {
      * @param d duration
      */
     integrate = function(d) {
-	console.log(JSON.stringify(my.force));
-	console.log(JSON.stringify(my.velocity));
-	console.log(JSON.stringify(my.position));
-
 	my.velocity.x += my.force.x * my.invmass * d;
 	my.velocity.y += my.force.y * my.invmass * d;	
 	// TOOD: add dampling if necessary
@@ -50,8 +59,29 @@ var particle = function(spec, my) {
 	my.force = { x: 0, y: 0 };
     };
 
+    /**
+     * returns the state of the particle
+     */
+    state = function() {
+	return { p: my.position,
+		 v: my.velocity };		 
+    };
+
+    /**
+     * updates the current object with a received state
+     * @param state {p, v}
+     */
+    update = function(s) {
+	my.position = s.p;
+	my.velocity = s.v;
+	// TODO: slow update
+    };
+
     method(that, 'integrate', integrate);
     method(that, 'apply', apply);
+
+    method(that, 'state', state);
+    method(that, 'update', update);
     
     getter(that, 'position', my, 'position');
     getter(that, 'velocity', my, 'velocity');
@@ -67,3 +97,5 @@ var particle = function(spec, my) {
 
     return that;
 };
+
+exports.particle = particle;

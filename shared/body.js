@@ -1,3 +1,13 @@
+if(typeof method === 'undefined')
+    var method = require('./base.js').method;
+if(typeof getter === 'undefined')
+    var getter = require('./base.js').getter;
+if(typeof setter === 'undefined')
+    var setter = require('./base.js').setter;
+
+if(typeof particle === 'undefined')
+    var particle = require('./particle.js').particle;
+
 /**
  * Body Object
  *
@@ -23,6 +33,9 @@ var body = function(spec, my) {
     var applyWP;        /* apply({x, y}, {x, y}); */
     var applyBP;        /* apply({x, y}, {x, y}); */
     var integrate;      /* integrate(duration); */
+
+    var state;      /* state() */
+    var update;     /* update(state) */
 
     var that = particle(spec, my);
     
@@ -69,7 +82,29 @@ var body = function(spec, my) {
 	// TOOD: add dampling if necessary
 	my.orientation += my.rotation * d;
 
-	_super.integrate();
+	my.torque = 0;
+	_super.integrate(d);
+    };
+
+    /**
+     * returns the state of the body
+     */
+    state = function() {
+	var s = _super.state();
+	s.o = my.orientation;
+	s.r = my.rotation;
+	return s;
+    };
+
+    /**
+     * updates the current object with a received state
+     * @param state {p, v}
+     */
+    update = function(s) {
+	_super.update(s);
+	my.orientation = s.o;
+	my.rotation = s.r;
+	// TODO: slow update
     };
     
 
@@ -78,9 +113,14 @@ var body = function(spec, my) {
     method(that, 'applyWP', applyWP, _super);
     method(that, 'applyBP', applyWP, _super);
 
+    method(that, 'state', state, _super);
+    method(that, 'update', update, _super);
+
     getter(that, 'invinertia', my, 'invinertia');
     getter(that, 'orientation', my, 'orientation');
     getter(that, 'rotation', my, 'rotation');
 
     return that;
 };
+
+exports.body = body;

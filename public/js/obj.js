@@ -15,7 +15,7 @@ var obj = function(spec, my) {
     my.object = null;
 
     // public
-    var init;   /* init(scene); */
+    var draw;   /* draw(scene); */
     var render; /* render(); */
     
     var that = body(spec, my);
@@ -24,7 +24,7 @@ var obj = function(spec, my) {
      * add object to the scene
      * @param scene the scene currently used     
      */
-    init = function(scene) {
+    draw = function(scene) {
 	// default object
 	var geometry = new THREE.CubeGeometry(that.radius(), that.radius(), that.radius());
 	var material = new THREE.MeshDepthMaterial( { near: 1, far: 2000, overdraw: true } );
@@ -44,7 +44,7 @@ var obj = function(spec, my) {
 	my.object.rotation.z = that.orientation();
     }
 
-    method(that, 'init', init);
+    method(that, 'draw', draw);
     method(that, 'render', render);
 
     return that;

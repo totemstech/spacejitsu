@@ -1,3 +1,5 @@
+if(typeof exports === 'undefined')
+    var exports = {};
 
 /**
  * method(that, name, method, _super)
@@ -44,3 +46,9 @@ var setter = function(that, name, obj, prop) {
 var responds = function(that, name) {
     return (that[name] && typeof that[name] === 'function');
 };
+
+
+exports.method = method;
+exports.getter = getter;
+exports.setter = setter;
+exports.responds = responds;

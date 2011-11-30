@@ -15,7 +15,7 @@ var earth = function(spec, my) {
     spec.orientation = 0;
 
     // public
-    var init;  /* init(scene); */
+    var draw;  /* draw(scene); */
 
     var that = obj(spec, my);
 
@@ -23,7 +23,7 @@ var earth = function(spec, my) {
      * add object to the scene
      * @param scene the scene currently used     
      */
-    init = function(scene) {
+    draw = function(scene) {
 	// default object
 	var geometry = new THREE.SphereGeometry(that.radius(), 20, 20);
 	var material = new THREE.MeshBasicMaterial({ color: 0x222233, opacity: 1.0, overdraw: true});
@@ -33,7 +33,7 @@ var earth = function(spec, my) {
 	that.render();
     };
 
-    method(that, 'init', init);
+    method(that, 'draw', draw);
 
     return that;
 };

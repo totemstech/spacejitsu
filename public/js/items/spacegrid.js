@@ -13,32 +13,34 @@ var spacegrid = function(spec, my) {
     spec.invinertia = 0; // does not move   
 
     // public
-    var init;      /* init(scene); */
+    var draw;      /* draw(scene); */
 
     var that = obj(spec, my);
 
-    init = function(scene) {
+    draw = function(scene) {
 	// x-lines
 	var xgeom = new THREE.Geometry();
-	xgeom.vertices.push( new THREE.Vertex( new THREE.Vector3(-1500, 0, 0)));
-	xgeom.vertices.push( new THREE.Vertex( new THREE.Vector3(1500, 0, 0)));	    
-	for ( var i = 0; i <= 20; i ++ ) {
-	    var line = new THREE.Line( xgeom, new THREE.LineBasicMaterial( { color: 0x444444, opacity: 0.4 } ) );
-	    line.position.y = ( i * 100 ) - 1000;
+	xgeom.vertices.push( new THREE.Vertex( new THREE.Vector3(-config.HALFSIZE_X, 0, 0)));
+	xgeom.vertices.push( new THREE.Vertex( new THREE.Vector3(config.HALFSIZE_X, 0, 0)));	    
+	for ( var i = 0; i <= (2 * config.HALFSIZE_Y / config.GRID_SPACE); i ++ ) {
+	    var line = new THREE.Line( xgeom, new THREE.LineBasicMaterial({ color: config.GRID_COLOR, 
+									    opacity: config.GRID_OPACITY }));
+	    line.position.y = (i * config.GRID_SPACE) - config.HALFSIZE_Y;
 	    scene.add(line);
 	}
 	// y-lines
 	var ygeom = new THREE.Geometry();
-	ygeom.vertices.push( new THREE.Vertex( new THREE.Vector3(0, -1000, 0)));
-	ygeom.vertices.push( new THREE.Vertex( new THREE.Vector3(0, 1000, 0)));	    
-	for ( var i = 0; i <= 30; i ++ ) {
-	    var line = new THREE.Line( ygeom, new THREE.LineBasicMaterial( { color: 0x444444, opacity: 0.4 } ) );
-	    line.position.x = ( i * 100 ) - 1500;
+	ygeom.vertices.push( new THREE.Vertex( new THREE.Vector3(0, -config.HALFSIZE_Y, 0)));
+	ygeom.vertices.push( new THREE.Vertex( new THREE.Vector3(0, config.HALFSIZE_Y, 0)));	    
+	for ( var i = 0; i <= (2 * config.HALFSIZE_X / config.GRID_SPACE); i ++ ) {
+	    var line = new THREE.Line( ygeom, new THREE.LineBasicMaterial({ color: config.GRID_COLOR, 
+									    opacity: config.GRID_OPACITY }));
+	    line.position.x = (i * config.GRID_SPACE) - config.HALFSIZE_X;
 	    scene.add(line);
 	}
     };
     
-    method(that, 'init', init, _super);
+    method(that, 'draw', draw, _super);
 
     return that;
 };
