@@ -1,13 +1,14 @@
 {
-  "name": "nodeapps-socket.io",
-  "author": "Nodejitsu Inc. <support@nodejitsu.com>",
+  "name": "escapewar",
+  "author": "Stanislas Polu <polu.stanislas@gmail.com>",
   "scripts": {
     "start": "./srv/app.js"
   },
-  "version": "0.1.0-1",
+  "version": "0.1.0-29",
   "dependencies": {
     "socket.io": "v0.8.x",
     "express": "v2.5.x"
   },
-  "analyze": false
+  "analyze": false,
+  "subdomain": "escapewar"
 }

@@ -26,31 +26,86 @@ var world = function(spec, my) {
     
     my.all = [];    
     my.idx = {};
+    my.owners = {};
 
     // public
-    var add;     /* add(particle); */
-    var remove;  /* add(particle); */
+    var add;      /* add(particle); */
+    var remove;   /* remove(id); */
+    var clear;    /* clear() */
 
     // protected
     var step;    /* step() */
     
     var that = {};
 
+    /**
+     * adds an object to the simulation
+     * @param b particle or subclass
+     */
     add = function(b) {
 	my.idx[b.id()] = b;
 	my.all.push(b);
+	my.owners[b.owner()] = my.owners[b.owner()] || [];
+	my.owners[b.owner()].push(b.id());
     };
 
-    remove = function(b) {
-	delete my.idx[b.id()];
+    /**
+     * removes an object from the simulation
+     * @param id particle or subclass id
+     */
+    remove = function(id) {
+	var o = my.owners[my.idx[id].owner()];
+	for(var i = 0; i < o.length; i++) {
+	    if(o[i] === id) {
+		o.splice(i, 1);
+		break;
+	    }	    
+	}
 	for(var i = 0; i < my.all.length; i++) {
-	    if(my.all[i].id() === b.id()) {
+	    if(my.all[i].id() === id) {
+		my.all[i].clear();
 		my.all.splice(i, 1);
-		return;
+		break;
+	    }
+	}
+	delete my.idx[id];
+    };
+
+    /** 
+     * clear all object from owner or the whole
+     * simulation if unspecified
+     * @param owner (optional)
+     */
+    clear = function(owner) {
+	if(typeof owner === 'undefined') {
+	    for(var i = 0; i < my.all.length; i ++) {
+		my.all[i].clear();
+	    }
+	    my.all = [];
+	    my.idx = {};
+	    my.owners = {};
+	}
+	else {
+	    var r = my.owners[owner];
+	    if(typeof r !== 'undefined') {
+		for(var i = 0; i < r.length; i ++) {
+		    for(var j = 0; j < my.all.length; j++) {
+			if(my.all[j].id() === r[i]) {
+			    my.all[j].clear();
+			    my.all.splice(j, 1);
+			    break;
+			}
+		    }
+		    delete my.idx[r[i]];		    
+		}
+		delete my.owners[owner];
 	    }
 	}
     };
 
+    /**
+     * step function to advance in time
+     */
     step = function() {
 	var d = 0;
 	if(typeof my.last !== 'undefined')
@@ -96,9 +151,11 @@ var world = function(spec, my) {
 
     method(that, 'add', add);
     method(that, 'remove', remove);
+    method(that, 'clear', clear);
 
     getter(that, 'idx', my, 'idx');
     getter(that, 'all', my, 'all');
+    getter(that, 'owners', my, 'owners');
 
     return that;
 };

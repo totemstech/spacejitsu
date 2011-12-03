@@ -112,9 +112,10 @@ var ship = function(spec, my) {
     /**
      * updates the current object with a received state
      * @param state {p, v}
+     * @param force snapping
      */
-    update = function(s) {
-	_super.update(s);
+    update = function(s, force) {
+	_super.update(s, force);
 	if(typeof s.i !== 'undefined') my.inputs = s.i;
     };
 

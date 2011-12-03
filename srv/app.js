@@ -4,25 +4,34 @@ var express = require("express");
 var app = express.createServer();
 var io = require('socket.io').listen(app);
 
+var config = require('./../shared/config.js').config;
+
 // Configuration
 app.configure(function(){
 	app.use(express.static(__dirname + '/../cli'));
     });
 
-var game = require('./game.js').game({});
+io.set('log level', 1);
+
 var incr = 0;
+var game = require('./game.js').game({});
+
+game.start();
 
 io.of('/game').on('connection', function(socket) {
 	var id = ++incr;
-	socket.set('id', id, function() {
-		socket.emit('init', { id : id });		
+	socket.set('id', id, function() {		
+		socket.emit('init', { id : id });
+		for(var i = 0; i < game.all().length; i++) {
+		    socket.emit('create', { desc: game.all()[i].desc() });
+		}
 	    });	
 	
 	socket.on('push', function(data) {
 		socket.get('id', function(err, id) {
 			if(!err) {
-			    game.push(id, data.id, data.state);
-			    io.of('/game').volatile.emit('push', {state: data.state, id: data.id, src: id});
+			    game.push(id, data.id, data.st);		
+			    io.of('/game').volatile.emit('push', data);
 			}
 		    });
 	    });
@@ -31,7 +40,16 @@ io.of('/game').on('connection', function(socket) {
 		socket.get('id', function(err, id) {
 			if(!err) {
 			    game.create(id, data.desc);
-			    io.of('/game').emit('create', {desc: data.desc, src: id});
+			    io.of('/game').emit('create', { desc: data.desc });
+			}
+		    });
+	    });
+
+	socket.on('disconnect', function () {
+		socket.get('id', function(err, id) {
+			if(!err) {
+			    game.clear(id);
+			    io.of('/game').emit('kill', {id: id});
 			}
 		    });
 	    });

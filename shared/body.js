@@ -118,12 +118,14 @@ var body = function(spec, my) {
     /**
      * updates the current object with a received state
      * @param state {p, v}
+     * @param force snapping
      */
-    update = function(s) {
-	_super.update(s);
-	if(typeof s.o !== 'undefined') my.orientation = s.o;
-	if(typeof s.r !== 'undefined') my.rotation = s.r;
-	// TODO: slow update
+    update = function(s, force) {
+	_super.update(s, force);
+	if(typeof s.o !== 'undefined') 
+	    my.orientation = that.smooth(my.orientation, s.o, force);
+	if(typeof s.r !== 'undefined') 
+	    my.rotation = s.r;
     };
     
 

@@ -33,10 +33,16 @@ var particle = function(spec, my) {
     // public
     var apply;      /* apply({x, y}); */
     var integrate;  /* integrate(duration); */
+    var simulate;   /* simulate(particle, step); */
 
     var desc;       /* desc() */
     var state;      /* state() */
     var update;     /* update(state) */
+
+    var clear;      /* clear() */
+
+    // protected
+    var smooth;     /* smooth(a, b, force) */
 
     var that = {};
 
@@ -83,29 +89,95 @@ var particle = function(spec, my) {
      */
     state = function() {
 	return { p: my.position,
-		 v: my.velocity };		 
+		 v: my.velocity };
+    };
+
+    /**
+     * peforms the smooth or snap of value a, b
+     * @param a original value
+     * @param b received value
+     * @param force snapping
+     */
+    smooth = function(a, b, force) {
+	if(force)
+	    return b;
+	else
+	    return (a + config.SMOOTH_FACTOR * (b - a));
     };
 
     /**
      * updates the current object with a received state
      * @param state {p, v}
+     * @param force snapping
      */
-    update = function(s) {
+    update = function(s, force) {
 	if(typeof s.p !== 'undefined') {
-	    my.position.x = 8/10 * my.position.x + 2/10 * s.p.x;
-	    my.position.y = 8/10 * my.position.y + 2/10 * s.p.y;
+	    var d = Math.sqrt((my.position.x - s.p.x) * (my.position.x - s.p.x) +
+			      (my.position.y - s.p.y) * (my.position.y - s.p.y));
+	    if(d > config.SNAP_THRESHOLD) {
+		console.log('SNAP! ' + d);
+		my.position = s.p;
+	    }
+	    else {
+		my.position.x = that.smooth(my.position.x, s.p.x, force);
+		my.position.y = that.smooth(my.position.y, s.p.y, force);
+	    }
 	}
-	my.velocity.x = s.v.x;
-	my.velocity.y = s.v.y;
+	if(typeof s.v !== 'undefined')
+	    my.velocity = s.v;
     };
+
+    /**
+     * do anything necessary when cleared from simu
+     */
+    clear = function() {
+    };
+
+    /**
+     * simulate n steps ahead of time simulation is part
+     * of a particle (after all it's a simulation)
+     * @param l number of steps
+     * @param step length of steps
+     * @return array of position
+     */
+    simulate = function(l, d) {
+	var vel = {x: my.velocity.x, y: my.velocity.y};
+	var pos = {x: my.position.x, y: my.position.y};
+	var d = d || config.STEP_TIME;
+	var res = [];
+	
+	for(var i = 0; i < l; i ++) {
+	    var f = {x: 0, y: 0};
+	    if(my.invmass != 0) {
+		var n = (pos.x * pos.x) + (pos.y * pos.y);
+		var g =  config.GM  / (my.invmass * n);
+		f = { x: - pos.x * g / Math.sqrt(n),
+		      y: - pos.y * g / Math.sqrt(n)};		
+	    }
+	    vel.x += f.x * my.invmass * d;
+	    vel.y += f.y * my.invmass * d;
+	    pos.x += vel.x * d;
+	    pos.y += vel.y * d;	
+	    
+	    res.push({x: pos.x, y: pos.y});
+	}
+	return res;
+    };
+
 
     method(that, 'integrate', integrate);
     method(that, 'apply', apply);
 
+    method(that, 'simulate', simulate);
+
     method(that, 'desc', desc);
     method(that, 'state', state);
     method(that, 'update', update);
+
+    method(that, 'clear', clear);
     
+    method(that, 'smooth', smooth);
+
     getter(that, 'id', my, 'id');
     getter(that, 'owner', my, 'owner');
     getter(that, 'type', my, 'type');

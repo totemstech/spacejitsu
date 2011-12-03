@@ -15,10 +15,11 @@ var config = {
     GRID_COLOR: 0x444444,
     GRID_OPACITY: 0.4,
 
-    SNAP_THRESHOLD: 0.05,
+    SMOOTH_FACTOR: 0.2,
+    SNAP_THRESHOLD: 100.0,
 
     RENDER_TIME: 15,
-    UPDATE_TIME: 500,
+    UPDATE_TIME: 300,
 
     DEFAULT_THRUST: { push: 0.002, rot: 0.005 },
     DEFAULT_MODEL: 'nomodel',
@@ -31,7 +32,12 @@ var config = {
     INPUT_DOWN: 'd',
     INPUT_LEFT: 'l',
     INPUT_RIGHT: 'r',
-    INPUT_SHOOT: 's'
+    INPUT_SHOOT: 's',
+    
+    CLIENT_SIDE: !(typeof module !== 'undefined' && module.exports),
+    SERVER_SIDE: (typeof module !== 'undefined' && module.exports),
+
+    SIMULATION_LEN: 15,
 };
 
 exports.config = config;

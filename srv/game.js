@@ -14,11 +14,45 @@ var game = function(spec, my) {
     var _super = {};
 
     // public
+    var start;  /* start(); */
+    var stop;   /* stop(); */
     var push;   /* push(owner, id, state) */    
     var create; /* create(owner, desc) */ 
 
+    // protected
+    var step;   /* step(); */
+
     var that = world(spec, my);
-    
+
+    /**
+     * starts the game (engine, render, network)
+     */
+    start = function() {
+	my.gtimer = setInterval(step, config.STEP_TIME);	
+    };
+
+    /**
+     * stops the game (engine, render)
+     */
+    stop = function() {
+	if(typeof my.gtimer !== 'undefined')
+	    clearInterval(my.gtimer);
+	delete my.gtimer;
+    };
+
+    /**
+     * steps the engine
+     */
+    step = function() {
+	for(var i = 0; i < that.all().length; i ++) {
+	    if(that.all()[i].type() === config.SHIP_TYPE) {
+		that.all()[i].thrust();
+	    }
+	}
+	_super.step();
+    };
+
+
     /**
      * if state is coming from the owner of the object
      * it updates the state of the object
@@ -29,7 +63,10 @@ var game = function(spec, my) {
     push = function(owner, id, state) {
 	if(typeof that.idx()[id] !== 'undefined' &&
 	   that.idx()[id].owner() === owner) {
-	    that.idx()[id].update(state);
+	    if(that.idx()[id].type() === config.SHIP_TYPE)
+		that.idx()[id].update(state, true); // force ship updates
+	    else
+		that.idx()[id].update(state);
 	}
     };
     
@@ -56,8 +93,13 @@ var game = function(spec, my) {
 	}
     };
 
+
+    method(that, 'start', start, _super);
+    method(that, 'stop', stop, _super);
     method(that, 'push', push);
     method(that, 'create', create);    
+
+    method(that, 'step', step, _super);
     
     return that;
 };

@@ -23,12 +23,14 @@ var game = function(spec, my) {
     var keyup;       /* keydown(evt) */
     
     // protected
-    var step;   /* step(); */
+    var step;        /* step(); */
 
     // private
-    var render; /* render(); */
-    var push;   /* push() */
-    var gid;    /* gid() */
+    var reset;       /* reset() */
+    var init;        /* init(); */
+    var render;      /* render(); */
+    var push;        /* push() */
+    var gid;         /* gid() */
 
     var that = world(spec, my);
 
@@ -39,7 +41,7 @@ var game = function(spec, my) {
 	if(typeof my.ship !== 'undefined') {
 	    //console.log('pushing: ' + JSON.stringify(my.ship.state()));
 	    my.socket.emit('push', { id: my.ship.id(), 
-			             state: my.ship.state() });
+			             st: my.ship.state() });
 	}	
     };
     
@@ -87,21 +89,29 @@ var game = function(spec, my) {
 	}
     };
 
-
+    /**
+     * inits core components
+     */
+    init = function() {
+	//my.renderer = new THREE.CanvasRenderer();
+	my.renderer = new THREE.WebGLRenderer();
+	my.renderer.setSize($('#' + my.container).width(), $('#' + my.container).height());	
+	$('#' + my.container).append(my.renderer.domElement);
+    };
 
     /**
-     * starts the game (engine, render, network)
+     * resets the game
      */
-    start = function() {
+    reset = function() {
 	// scene
 	my.scene = new THREE.Scene();
-
 	// camera
 	my.camera = new THREE.PerspectiveCamera(75, config.HALFSIZE_X / config.HALFSIZE_Y, 
 						1000, 1500);
 	//my.camera.position.z = 1965;
 	my.camera.position.z = 1305;
 	my.scene.add(my.camera);
+	my.camera.lookAt(my.scene.position);	
 	
 	// space grid
 	my.spacegrid = spacegrid({});
@@ -109,26 +119,27 @@ var game = function(spec, my) {
 	// earth
 	my.earth = earth({});
 	that.add(my.earth);
-	my.earth.draw(my.scene);
+	my.earth.draw(my.scene);	
 
-	//my.renderer = new THREE.CanvasRenderer();
-	my.renderer = new THREE.WebGLRenderer();
-	my.renderer.setSize($('#' + my.container).width(), $('#' + my.container).height());
-	
-	my.camera.lookAt(my.scene.position);
-	
-	$('#' + my.container).append(my.renderer.domElement);
+	that.clear();
+    };
+    
+
+    /**
+     * starts the game (engine, render, network)
+     */
+    start = function() {
 	
 	my.rtimer = setInterval(render, config.RENDER_TIME);
 	my.gtimer = setInterval(step, config.STEP_TIME);
-	// TODO: put server side
 	my.utimer = setInterval(push, config.UPDATE_TIME);
-
+	
 	/** distributed simulation interface */
 	
 	my.socket = io.connect('/game');
 	
 	my.socket.on('init', function(data) {
+		reset();
 		my.id = data.id;
 		// ship buildup
 		my.ship = vx0( { id: gid(),
@@ -147,7 +158,7 @@ var game = function(spec, my) {
 	    });	
 
 	my.socket.on('create', function(data) {
-		if(data.src !== my.id) {
+		if(data.desc.owner !== my.id) {
 		    if(data.desc.type === config.SHIP_TYPE) {
 			switch(data.desc.model) {
 			  case 'vx0':
@@ -161,12 +172,17 @@ var game = function(spec, my) {
 		}
 	    });		
 	my.socket.on('push', function(data) {
-		if(that.idx()[data.id] !== 'undefined') {
-		    that.idx()[data.id].update(data.state);
+		if(that.idx()[data.id] !== 'undefined' &&
+		   that.idx()[data.id].owner() !== my.id) {
+		    that.idx()[data.id].update(data.st);
 		}
 	    });	
 	my.socket.on('delete', function(data) {
 		// [ids]
+	    });	
+	my.socket.on('kill', function(data) {
+		console.log('KILL');
+		that.clear(data.id);	     
 	    });	
 	my.socket.on('explode', function(data) {
 		// [ids]
@@ -183,16 +199,24 @@ var game = function(spec, my) {
 	if(typeof my.rtimer !== 'undefined')
 	    clearInterval(my.rtimer);
 	delete my.rtimer;
+	if(typeof my.utimer !== 'undefined')
+	    clearInterval(my.utimer);
+	delete my.utimer;
     };
+
 
     /**
      * renders the current scene
      */
     render = function() {
+	if(typeof my.ship !== 'undefined') {
+	    my.ship.simulate();
+	}
 	for(var i = 0; i < that.all().length; i ++) {
 	    that.all()[i].render();
 	} 
-	my.renderer.render(my.scene, my.camera);
+	if(my.scene && my.camera)
+	    my.renderer.render(my.scene, my.camera);
     };
     
     /**
@@ -220,9 +244,12 @@ var game = function(spec, my) {
 
     method(that, 'start', start, _super);
     method(that, 'stop', stop, _super);
-    method(that, 'step', step, _super);
     method(that, 'keydown', keydown, _super);
     method(that, 'keyup', keyup, _super);
+
+    method(that, 'step', step, _super);
+
+    init();
     
     return that;
 };
