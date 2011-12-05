@@ -115,7 +115,6 @@ var particle = function(spec, my) {
 	    var d = Math.sqrt((my.position.x - s.p.x) * (my.position.x - s.p.x) +
 			      (my.position.y - s.p.y) * (my.position.y - s.p.y));
 	    if(d > config.SNAP_THRESHOLD) {
-		console.log('SNAP! ' + d);
 		my.position = s.p;
 	    }
 	    else {

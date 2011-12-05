@@ -27,6 +27,7 @@ var config = {
     PARTICLE_TYPE: 'particle',
     BODY_TYPE: 'body',
     SHIP_TYPE: 'ship',
+    SHOOT_TYPE: 'shoot',
     
     INPUT_UP: 'u',
     INPUT_DOWN: 'd',

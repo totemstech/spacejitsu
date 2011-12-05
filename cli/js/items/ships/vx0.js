@@ -16,7 +16,7 @@ var vx0 = function(spec, my) {
     my.sims = [];
 
     // public
-    var draw;      /* draw(scene) */
+    var init;      /* init(scene) */
     var render;    /* render() */
     var simulate;  /* simulate() */
 
@@ -27,7 +27,8 @@ var vx0 = function(spec, my) {
      * add object to the scene
      * @param scene the scene currently used     
      */
-    draw = function(scene) {
+    init = function(scene) {
+		
 	// default object
 	var cube = new THREE.CubeGeometry(10,10,10);
 	my.object = new THREE.Object3D();

@@ -8,6 +8,7 @@
     <!-- LIB SCRIPTS -->
     <script type="text/javascript" src="/lib/jquery.min.js"></script>
     <script type="text/javascript" src="/lib/Three.js"></script>
+    <script type="text/javascript" src="/lib/PhiloGL.js"></script>
     <script type="text/javascript" src="/socket.io/socket.io.js"></script> <!-- served through socket.io route -->
 
     <!-- SHARED SCRIPTS -->    
@@ -27,15 +28,7 @@
     
     <script>
       window.onload = function () {
-        var g = game({container: 'world'});
-
-        $(document).keydown(function(evt) {
-          g.keydown(evt);          
-        });
-        $(document).keyup(function(evt) {
-          g.keyup(evt);
-        });
-
+        var g = game({canvas: 'world'});
         g.start();
       };
     </script>
@@ -59,7 +52,7 @@
 
   <body>    
     <center>
-      <div id="world" style=""></div>
+      <canvas id="world" style="border: 1px solid grey;" width="1200" height="800"></canvas>
     </center>
   </body>
 </html>

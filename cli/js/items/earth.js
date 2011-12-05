@@ -14,8 +14,10 @@ var earth = function(spec, my) {
     spec.radius = config.EARTH_RADIUS;
     spec.orientation = 0;
 
+    my.yor = 0;
+
     // public
-    var draw;    /* draw(scene); */
+    var init;    /* init(scene); */
     var render;  /* render() */
 
     var that = body(spec, my);
@@ -24,28 +26,32 @@ var earth = function(spec, my) {
      * add object to the scene
      * @param scene the scene currently used     
      */
-    draw = function(scene) {
-	// default object
-	var geometry = new THREE.SphereGeometry(that.radius(), 20, 20);
-	var material = new THREE.MeshBasicMaterial({ color: 0x222233, opacity: 1.0, overdraw: true});
-	my.object = new THREE.Mesh(geometry, material );
-	//my.object.scale.x = 2;
+    init = function(scene) {
+	my.object = new PhiloGL.O3D.Sphere({
+		nlat: 30,
+		nlong: 30,
+		radius: spec.radius,
+		textures: '/img/moon.gif'
+	    });	
 	scene.add(my.object);	
-	that.render();
     };
 
     /**
      * renders the object (step)
      */
     render = function() {
+	//console.log(JSON.stringify(my.object.position));
 	my.object.position.x = that.position().x;
 	my.object.position.y = that.position().y;
 	my.object.position.z = 0;
 	my.object.rotation.z = that.orientation();
-    }
+	my.yor += 0.001;
+	my.object.rotation.y = my.yor;
+	my.object.update();
+    };
 
     method(that, 'render', render);
-    method(that, 'draw', draw);
+    method(that, 'init', init);
 
     return that;
 };

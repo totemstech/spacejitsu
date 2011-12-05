@@ -14,7 +14,7 @@ if(typeof body === 'undefined')
 /**
  * Ship Object
  *
- * @extends obj
+ * @extends body
  * 
  * @param spec {id, owner, type, model,
  *              invmass, invinertia, 
