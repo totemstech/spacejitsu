@@ -6,7 +6,7 @@
  * @param spec {invmass, invinertia, 
  *              position, orientation,
  *              velocity, rotation,
- *              radius, thrust}
+ *              radius, thrust, GL}
  */
 var vx0 = function(spec, my) {
     var my = my || {};
@@ -14,59 +14,24 @@ var vx0 = function(spec, my) {
 
     spec.model = spec.model || 'vx0';
     my.sims = [];
+    
+    my.GL = spec.GL;
+    my.voxel = voxel({GL: my.GL});
 
     // public
-    var init;      /* init(scene) */
     var render;    /* render() */
     var simulate;  /* simulate() */
 
-    var that = ship(spec, my);
+    var that = ship(spec, my);    
 
-
-    /**
-     * add object to the scene
-     * @param scene the scene currently used     
-     */
-    init = function(scene) {
-		
-	// default object
-	var cube = new THREE.CubeGeometry(10,10,10);
-	my.object = new THREE.Object3D();
-	
-	my.scene = scene;
-	var voxel;
-
-	voxel = new THREE.Mesh(cube, new THREE.MeshBasicMaterial({color: 0x448844, opacity: 1.0, overdraw: true}));
-	voxel.position.x = 0;
-	voxel.position.y = 10;
-	voxel.position.z = 0;	
-	my.object.add(voxel);
-
-	voxel = new THREE.Mesh(cube, new THREE.MeshBasicMaterial({color: 0x444444, opacity: 1.0, overdraw: true}));
-	voxel.position.x = 10;
-	voxel.position.y = 0;
-	voxel.position.z = 0;	
-	my.object.add(voxel);
-
-	voxel = new THREE.Mesh(cube, new THREE.MeshBasicMaterial({color: 0x444444, opacity: 1.0, overdraw: true}));
-	voxel.position.x = -10;
-	voxel.position.y = 0;
-	voxel.position.z = 0;	
-	my.object.add(voxel);
-	
-	my.scene.add(my.object);	
-	that.render();
-    };
 
     /**
      * renders the object (step)
      */
-    render = function() {	
-	my.object.position.x = that.position().x + 10;
-	my.object.position.y = that.position().y;
-	my.object.position.z = 0;
-	my.object.rotation.z = that.orientation();
-    }
+    render = function() {			
+	my.voxel.setColor([0, 1, 0]);
+	my.voxel.draw();
+    };
 
     /**
      * simulate and render trajectory
@@ -95,12 +60,10 @@ var vx0 = function(spec, my) {
     }
 
     clear = function() {
-	my.scene.remove(my.object);
 	_super.clear();
     };
 
     method(that, 'render', render, _super);
-    method(that, 'draw', draw, _super);
     method(that, 'clear', clear, _super);
     method(that, 'simulate', simulate, _super);
 

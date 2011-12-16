@@ -11,7 +11,7 @@ app.configure(function(){
 	app.use(express.static(__dirname + '/../cli'));
     });
 
-io.set('log level', 1);
+io.set('log level', 3);
 
 var incr = 0;
 var game = require('./game.js').game({});

@@ -24,16 +24,8 @@ var earth = function(spec, my) {
 
     /**
      * add object to the scene
-     * @param scene the scene currently used     
      */
-    init = function(scene) {
-	my.object = new PhiloGL.O3D.Sphere({
-		nlat: 30,
-		nlong: 30,
-		radius: spec.radius,
-		textures: '/img/moon.gif'
-	    });	
-	scene.add(my.object);	
+    init = function() {
     };
 
     /**

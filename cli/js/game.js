@@ -11,6 +11,10 @@ var game = function(spec, my) {
     var _super = {};
 
     my.canvas = spec.canvas;
+    my.GL = GL({ canvas: my.canvas,
+		 fov: 45,
+		 near: 0.1,
+		 far: 100.0 });
 
     my.ship = undefined;
     my.rockets = undefined;
@@ -18,10 +22,9 @@ var game = function(spec, my) {
 
     // public
     var start;       /* start(); */
-    var stop;        /* stop(); */
     var keydown;     /* keydown(evt) */
     var keyup;       /* keydown(evt) */
-    
+
     // protected
     var step;        /* step(); */
 
@@ -29,6 +32,7 @@ var game = function(spec, my) {
     var render;      /* render(); */
     var push;        /* push() */
     var gid;         /* gid() */
+    var mvTo;        /* mvTo(body) */
 
     var that = world(spec, my);
 
@@ -91,138 +95,100 @@ var game = function(spec, my) {
     /**
      * starts the game (engine, render, network)
      */
-    start = function() {	
-	PhiloGL(my.canvas, { 
-		onError: function() {
-		    alert("An error ocurred while loading the application");
-		},
-		camera: {
-		    near: 1,
-		    far: 2000,
-		    position: {
-			x: 0, y: 0, z: 1800
-		    }
-		},
-		textures: {
-		    src: ['/img/moon.gif'],
-		    parameters: [{
-			    name: 'TEXTURE_MAG_FILTER',
-			    value: 'LINEAR'
-			}, {
-			    name: 'TEXTURE_MIN_FILTER',
-			    value: 'LINEAR_MIPMAP_NEAREST',
-			    generateMipmap: true
-			}]
-		},
-		onLoad: function(app) {
-
-		    /** gl initialisation */
-		     
-		    my.app = app;
-		    my.gl = my.app.gl
-		    my.scene = my.app.scene;
-
-		    my.gl.viewport(0, 0, my.app.canvas.width, my.app.canvas.height);
-		    my.gl.clearColor(0, 0, 0, 1);
-		    my.gl.clearDepth(1);
-		    my.gl.enable(my.gl.DEPTH_TEST);
-		    my.gl.depthFunc(my.gl.LEQUAL);
-
-		    my.earth = earth({});
-		    my.earth.init(my.scene);
-
-		    my.gtimer = setInterval(step, config.STEP_TIME);
-		    my.utimer = setInterval(push, config.UPDATE_TIME);		    
-
-		    render();		    
-
-		    /** distributed simulation interface */
-		    
-		    my.socket = io.connect('/game');
-		    
-		    my.socket.on('init', function(data) {
-			    my.id = data.id;
-			    // ship buildup
-			    my.ship = vx0( { id: gid(),
-					     owner: my.id,
-					     invmass: 0.2,				
-					     invinertia: 2.002,
-					     radius: 15,
-					     position: {x: (400) * Math.cos(Math.PI/100),
-							y: (400) * Math.sin(Math.PI/100) },
-					     velocity: {x: 0.3 * Math.sin(Math.PI/100),
-							y: 0.3 * Math.cos(Math.PI/100) } });
-			    that.add(my.ship);
-			    //my.ship.draw(my.scene);
-			    
-			    my.socket.emit('create', { desc: my.ship.desc() });
-			});	
-		    
-		    my.socket.on('create', function(data) {
-			    if(data.desc.owner !== my.id) {
-				if(data.desc.type === config.SHIP_TYPE) {
-				    switch(data.desc.model) {
-				    case 'vx0':
-					var s = vx0(data.desc);
-					that.add(s);
-					//s.draw(my.scene);			    
-					break;
-				    default:
-				    }
-				}		    
-			    }
-			});		
-		    my.socket.on('push', function(data) {
-			    if(that.idx()[data.id] !== 'undefined' &&
-			       that.idx()[data.id].owner() !== my.id) {
-				that.idx()[data.id].update(data.st);
-			    }
-			});	
-		    my.socket.on('delete', function(data) {
-			    // [ids]
-			});	
-		    my.socket.on('kill', function(data) {
-			    console.log('KILL');
-			    that.clear(data.id);	     
-			});	
-		    my.socket.on('explode', function(data) {
-			    // [ids]
-			});		    		    
+    start = function() {				
+	my.earth = earth({});
+	my.earth.init(my.scene);
+	
+	my.gtimer = setInterval(step, config.STEP_TIME);
+	my.utimer = setInterval(push, config.UPDATE_TIME);		    
+	
+	render();		    
+	
+	/** distributed simulation interface */
+	
+	my.socket = io.connect('/game');
+	
+	my.socket.on('init', function(data) {
+		my.id = data.id;
+		// ship buildup
+		my.ship = vx0( { id: gid(),
+				 owner: my.id,
+				 invmass: 0.2,				
+				 invinertia: 2.002,
+				 radius: 15,
+				 position: {x: (400) * Math.cos(Math.PI/100),
+					    y: (400) * Math.sin(Math.PI/100) },
+				 velocity: {x: 0.3 * Math.sin(Math.PI/100),
+					    y: 0.3 * Math.cos(Math.PI/100) },
+				 GL: my.GL });
+		that.add(my.ship);
+		//my.ship.draw(my.scene);
+		
+		my.socket.emit('create', { desc: my.ship.desc() });
+	    });	
+	
+	my.socket.on('create', function(data) {
+		if(data.desc.owner !== my.id) {
+		    if(data.desc.type === config.SHIP_TYPE) {
+			switch(data.desc.model) {
+			case 'vx0':
+			    var spec = data.desc;
+			    spec.GL = my.GL;
+			    var s = vx0(spec);
+			    that.add(s);
+			    //s.draw(my.scene);			    
+			    break;
+			default:
+			}
+		    }		    
+		}
+	    });		
+	my.socket.on('push', function(data) {
+		if(that.idx()[data.id] !== 'undefined' &&
+		   that.idx()[data.id].owner() !== my.id) {
+		    that.idx()[data.id].update(data.st);
 		}
 	    });	
+	my.socket.on('delete', function(data) {
+		// [ids]
+	    });	
+	my.socket.on('kill', function(data) {
+		console.log('KILL');
+		that.clear(data.id);	     
+	    });	
+	my.socket.on('explode', function(data) {
+		// [ids]
+	    });		    		    
     };
-   
+
     /**
-     * stops the game (engine, render)
+     * move the gl model view matrix to the body position
+     * @param body the body the model view is going to
      */
-    stop = function() {
-	if(typeof my.gtimer !== 'undefined')
-	    clearInterval(my.gtimer);
-	delete my.gtimer;
-	if(typeof my.rtimer !== 'undefined')
-	    clearInterval(my.rtimer);
-	delete my.rtimer;
-	if(typeof my.utimer !== 'undefined')
-	    clearInterval(my.utimer);
-	delete my.utimer;
+    mvTo = function(body) {
+	mat4.identity(my.GL.mvMatrix());
+	mat4.translate(my.GL.mvMatrix(), [body.position().x,
+					  body.position().y,
+					  body.position().z]);	
+	mat4.rotate(my.GL.mvMatrix(), body.orientation(), [0, 0, 1]);		
     };
-
-
+    
     /**
      * renders the current scene
      */
     render = function() {
-	my.gl.clear(my.gl.COLOR_BUFFER_BIT | my.gl.DEPTH_BUFFER_BIT);
-	my.earth.render();      
+	my.GL.clear();
+	//my.earth.render();      
 	if(typeof my.ship !== 'undefined') {
 	    //my.ship.simulate();
 	}
 	for(var i = 0; i < that.all().length; i ++) {
-	    //that.all()[i].render();
+	    my.GL.mvPushMatrix();
+	    mvTo(that.all()[i]);
+	    that.all()[i].render();
+	    my.GL.mvPopMatrix();
 	} 
-	my.scene.render();
-
-	PhiloGL.Fx.requestAnimationFrame(render);
+	my.GL.animationFrame(render);
     };
     
     /**
@@ -249,7 +215,6 @@ var game = function(spec, my) {
     };
 
     method(that, 'start', start, _super);
-    method(that, 'stop', stop, _super);
     method(that, 'keydown', keydown, _super);
     method(that, 'keyup', keyup, _super);
 
