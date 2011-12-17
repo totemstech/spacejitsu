@@ -3,18 +3,26 @@
  *
  * @extends obj
  * 
- * @param spec {}
+ * @param spec {GL}
  */
 var earth = function(spec, my) {
     var my = my || {};
     var _super = {};
     
+    my.GL = spec.GL;
+
     spec.invmass = 0;    // does not move
     spec.invinertia = 0; // does not move   
     spec.radius = config.EARTH_RADIUS;
     spec.orientation = 0;
+    spec.rotation = 0.01;
+
+    my.voxel = voxel({GL: my.GL,
+		      size: config.EARTH_RADIUS});
 
     my.yor = 0;
+
+    my.GL = spec.GL;
 
     // public
     var init;    /* init(scene); */
@@ -23,23 +31,11 @@ var earth = function(spec, my) {
     var that = body(spec, my);
 
     /**
-     * add object to the scene
-     */
-    init = function() {
-    };
-
-    /**
      * renders the object (step)
      */
     render = function() {
-	//console.log(JSON.stringify(my.object.position));
-	my.object.position.x = that.position().x;
-	my.object.position.y = that.position().y;
-	my.object.position.z = 0;
-	my.object.rotation.z = that.orientation();
-	my.yor += 0.001;
-	my.object.rotation.y = my.yor;
-	my.object.update();
+	my.voxel.setColor([0.1, 0.1, 0.3, 1]);
+	my.voxel.draw();
     };
 
     method(that, 'render', render);

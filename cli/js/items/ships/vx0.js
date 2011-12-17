@@ -12,11 +12,14 @@ var vx0 = function(spec, my) {
     var my = my || {};
     var _super = {};
 
-    spec.model = spec.model || 'vx0';
-    my.sims = [];
-    
+    spec.model = spec.model || 'vx0';    
+
     my.GL = spec.GL;
-    my.voxel = voxel({GL: my.GL});
+    my.size = 4;
+    my.shipvx = voxel({GL: my.GL,
+		       size: my.size});
+    my.simvx =  voxel({GL: my.GL,
+		       size: my.size / 2.0});
 
     // public
     var render;    /* render() */
@@ -28,34 +31,35 @@ var vx0 = function(spec, my) {
     /**
      * renders the object (step)
      */
-    render = function() {			
-	my.voxel.setColor([0, 1, 0]);
-	my.voxel.draw();
+    render = function() {	
+
+	my.shipvx.setColor([0, 1, 0, 1]);
+
+	mat4.translate(my.GL.mvMatrix(), [my.size, -my.size, 0.0]);	
+	my.shipvx.draw();
+	mat4.translate(my.GL.mvMatrix(), [-2*my.size, 0.0, 0.0]);	
+	my.shipvx.draw();
+
+	my.shipvx.setColor([1, 0, 0, 1]);
+
+	mat4.translate(my.GL.mvMatrix(), [my.size, 2*my.size, 0.0]);	
+	my.shipvx.draw();
     };
 
     /**
      * simulate and render trajectory
      */ 
-    simulate = function() {
-	if(my.sims.length === 0) {
-	    var scube = new THREE.CubeGeometry(3,3,3);
-	    for(var i = 0; i < config.SIMULATION_LEN; i++) {
-		var sim = new THREE.Mesh(scube, new THREE.MeshBasicMaterial({color: 0x226688, 
-									     opacity: 0.6 - 0.5 / config.SIMULATION_LEN * i, 
-									     overdraw: true}));
-		sim.position.x = 0;
-		sim.position.y = 0;
-		sim.position.z = 0;	
-		my.sims.push(sim);
-		my.scene.add(sim);	
-	    }
-	}
-	
-	var s = _super.simulate(config.SIMULATION_LEN, 200);
+    simulate = function() {	
+	var s = _super.simulate(config.SIMULATION_LEN, 200);	
 	for(var i = 0; i < config.SIMULATION_LEN; i++) {
-	    my.sims[i].position.x = s[i].x;
-	    my.sims[i].position.y = s[i].y;	    
-	    my.sims[i].position.z = 0;
+	    my.simvx.setColor([0.4 - 0.3 / config.SIMULATION_LEN * i, 
+			       0.4 - 0.3 / config.SIMULATION_LEN * i,
+			       0.4 - 0.3 / config.SIMULATION_LEN * i, 1]);
+	    mat4.identity(my.GL.mvMatrix());
+	    mat4.translate(my.GL.mvMatrix(), [s[i].x,
+					      s[i].y,
+					      0]);	    
+	    my.simvx.draw();
 	}
     }
 

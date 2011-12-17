@@ -3,7 +3,7 @@
  *
  * @extends {}
  * 
- * @param spec {canvas, fov, near, far, stype}
+ * @param spec {canvas, fov, near, far, pos, stype}
  */
 var GL = function(spec, my) {
     var my = my || {};
@@ -12,6 +12,7 @@ var GL = function(spec, my) {
     my.fov = spec.fov || 45;
     my.near = spec.near || 0.1;
     my.far = spec.far || 100.0;    
+    my.pos = spec.pos || [0, 0, -10];
 
     my.stype = spec.stype || 'basic'
 
@@ -19,62 +20,24 @@ var GL = function(spec, my) {
 	basic: { fs: 
 		 'precision mediump float;' + 
 		 '' +
-		 'varying vec2 vTextureCoord;' +
 		 'varying vec4 vColor;' +
-		 'varying vec3 vLightWeighting;' +
-		 '' +
-		 'uniform sampler2D uSampler;' +
-		 'uniform bool uHasTexture;' +
 		 '' +
 		 'void main(void) {' +
-		 '    if(!uHasTexture) {' +
-		 '        gl_FragColor = vec4(vColor.rgb * vLightWeighting, vColor.a);' +
-		 '    }' +
-		 '    else {' +
-		 '        vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));' +
-		 '        gl_FragColor = vec4(textureColor.rgb * vLightWeighting, textureColor.a);' +
-		 '    }' +
+		 '    gl_FragColor = vec4(vColor.rgb, vColor.a);' +
 		 '}',
 		 vs:
 		 'attribute vec3 aVertexPosition;' +
 		 'attribute vec3 aVertexNormal;' +
 		 'attribute vec4 aVertexColor;' +
-		 'attribute vec2 aTextureCoord;' +
 		 '' +
 		 'uniform mat4 uMVMatrix;' +
 		 'uniform mat4 uPMatrix;' +
-		 'uniform mat3 uNMatrix;' +
 		 '' +
-		 'uniform bool uHasTexture;' +
-		 'uniform bool uUseLighting;' +
-		 '' +
-		 'uniform vec3 uAmbientColor;' +
-		 '' +
-		 'uniform vec3 uLightingDirection;' +
-		 'uniform vec3 uDirectionalColor;' +
-		 '' +
-		 'varying vec2 vTextureCoord;' +
-		 'varying vec3 vLightWeighting;' +
 		 'varying vec4 vColor;' +
 		 '' +
 		 'void main(void) {' +
 		 '    gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);' +
-		 '' +
-		 '    if(!uHasTexture) {' +
-		 '        vColor = aVertexColor;' +
-		 '    }' +
-		 '    else {' +
-		 '        vTextureCoord = aTextureCoord;' +
-		 '    }' +
-		 '' +
-		 '    if (!uUseLighting) {' +
-		 '        vLightWeighting = vec3(1.0, 1.0, 1.0);' +
-		 '    }' +
-		 '    else {' +
-		 '        vec3 transformedNormal = uNMatrix * aVertexNormal;' +
-		 '        float directionalLightWeighting = max(dot(transformedNormal, uLightingDirection), 0.0);' +
-		 '        vLightWeighting = uAmbientColor + uDirectionalColor * directionalLightWeighting;' +
-		 '    }' +
+		 '    vColor = aVertexColor;' +
 		 '}' }
     };
     
@@ -171,13 +134,6 @@ var GL = function(spec, my) {
 
         my.shader.pMatrixUniform = my.gl.getUniformLocation(my.shader, "uPMatrix");
         my.shader.mvMatrixUniform = my.gl.getUniformLocation(my.shader, "uMVMatrix");
-        my.shader.nMatrixUniform = my.gl.getUniformLocation(my.shader, "uNMatrix");
-        my.shader.samplerUniform = my.gl.getUniformLocation(my.shader, "uSampler");
-        my.shader.hasTextureUniform = my.gl.getUniformLocation(my.shader, "uHasTexture");
-        my.shader.useLightingUniform = my.gl.getUniformLocation(my.shader, "uUseLighting");
-        my.shader.ambientColorUniform = my.gl.getUniformLocation(my.shader, "uAmbientColor");
-        my.shader.lightingDirectionUniform = my.gl.getUniformLocation(my.shader, "uLightingDirection");
-        my.shader.directionalColorUniform = my.gl.getUniformLocation(my.shader, "uDirectionalColor");
 
 	my.gl.enable(my.gl.DEPTH_TEST);
 	my.gl.depthFunc(my.gl.LEQUAL);
@@ -192,6 +148,7 @@ var GL = function(spec, my) {
 	my.gl.viewport(0, 0, my.canvas.width, my.canvas.height);
         my.gl.clear(my.gl.COLOR_BUFFER_BIT | my.gl.DEPTH_BUFFER_BIT);	
 	mat4.perspective(my.fov, my.canvas.width / my.canvas.height, my.near, my.far, my.pMatrix);
+	mat4.translate(my.pMatrix, my.pos);	
 	mat4.identity(my.mvMatrix);
 	my.mvMatrixStack = [];
     };
@@ -202,16 +159,16 @@ var GL = function(spec, my) {
      * @param elem the canvas elem as per browser interface
      */
     animationFrame = function(cb, elem) {
-	window.requestAnimFrame = (function() {
-		return (window.requestAnimationFrame ||
-			window.webkitRequestAnimationFrame ||
-			window.mozRequestAnimationFrame ||
-			window.oRequestAnimationFrame ||
-			window.msRequestAnimationFrame ||
-			function(callback, element) {
-			    window.setTimeout(callback, 1000/60);
-			});
-	    })();	
+	(function() {
+	    return (window.requestAnimationFrame ||
+		    window.webkitRequestAnimationFrame ||
+		    window.mozRequestAnimationFrame ||
+		    window.oRequestAnimationFrame ||
+		    window.msRequestAnimationFrame ||
+		    function(callback, element) {
+			window.setTimeout(callback, 1000/60);
+		    });
+	})()(cb, elem);	
     };
     
     method(that, 'setMatrixUniforms', setMatrixUniforms);
@@ -232,6 +189,7 @@ var GL = function(spec, my) {
     setter(that, 'fov', my, 'fov');
     setter(that, 'near', my, 'near');
     setter(that, 'far', my, 'far');
+    setter(that, 'pos', my, 'pos');
 
     init();
 

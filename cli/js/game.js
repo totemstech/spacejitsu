@@ -13,8 +13,9 @@ var game = function(spec, my) {
     my.canvas = spec.canvas;
     my.GL = GL({ canvas: my.canvas,
 		 fov: 45,
-		 near: 0.1,
-		 far: 100.0 });
+		 near: 1000,
+		 far: 2500.0, 
+		 pos: [0.0, 0.0, -2400] });
 
     my.ship = undefined;
     my.rockets = undefined;
@@ -96,8 +97,7 @@ var game = function(spec, my) {
      * starts the game (engine, render, network)
      */
     start = function() {				
-	my.earth = earth({});
-	my.earth.init(my.scene);
+	my.earth = earth({GL: my.GL});
 	
 	my.gtimer = setInterval(step, config.STEP_TIME);
 	my.utimer = setInterval(push, config.UPDATE_TIME);		    
@@ -169,7 +169,7 @@ var game = function(spec, my) {
 	mat4.identity(my.GL.mvMatrix());
 	mat4.translate(my.GL.mvMatrix(), [body.position().x,
 					  body.position().y,
-					  body.position().z]);	
+					  0]);	
 	mat4.rotate(my.GL.mvMatrix(), body.orientation(), [0, 0, 1]);		
     };
     
@@ -178,9 +178,17 @@ var game = function(spec, my) {
      */
     render = function() {
 	my.GL.clear();
-	//my.earth.render();      
+
+	my.GL.mvPushMatrix();
+	mvTo(my.earth);
+	my.earth.render();
+	my.GL.mvPopMatrix();
+
 	if(typeof my.ship !== 'undefined') {
-	    //my.ship.simulate();
+	    my.GL.mvPushMatrix();
+	    mvTo(my.ship);
+	    my.ship.simulate();
+	    my.GL.mvPopMatrix();
 	}
 	for(var i = 0; i < that.all().length; i ++) {
 	    my.GL.mvPushMatrix();
