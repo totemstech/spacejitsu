@@ -17,15 +17,13 @@ var m0 = function(spec, my) {
     spec.lifespan = 4000;
 
     my.GL = spec.GL;
-    my.size = 2;
     my.vx = voxel({GL: my.GL,
-                   size: my.size});
+                   halfsize: 2});
 
     // public
     var render;    /* render() */
 
     var that = missile(spec, my);    
-
 
     /**
      * renders the object (step)

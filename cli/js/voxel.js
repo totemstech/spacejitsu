@@ -3,7 +3,7 @@
  *
  * @extends {}
  * 
- * @param spec {GL, size}
+ * @param spec {GL, halfsize}
  */
 var voxel = function(spec, my) {
     var my = my || {};
@@ -11,7 +11,7 @@ var voxel = function(spec, my) {
     
     my.GL = spec.GL;
     my.gl = spec.GL.gl();
-    my.size = spec.size || 5.0;
+    my.halfsize = spec.halfsize || 5.0;
 
     my.voxelVertexPositionBuffer = my.gl.createBuffer();
     my.voxelVertexColorBuffer = my.gl.createBuffer();
@@ -68,40 +68,40 @@ var voxel = function(spec, my) {
     init = function() {
 	my.gl.bindBuffer(my.gl.ARRAY_BUFFER, my.voxelVertexPositionBuffer);
 	var vertices = [// Front face
-			-my.size, -my.size,  my.size,
-			my.size, -my.size,  my.size,
-			my.size,  my.size,  my.size,
-			-my.size,  my.size,  my.size,
+			-my.halfsize, -my.halfsize,  my.halfsize,
+			my.halfsize, -my.halfsize,  my.halfsize,
+			my.halfsize,  my.halfsize,  my.halfsize,
+			-my.halfsize,  my.halfsize,  my.halfsize,
 			
 			// Back face
-			-my.size, -my.size, -my.size,
-			-my.size,  my.size, -my.size,
-			my.size,  my.size, -my.size,
-			my.size, -my.size, -my.size,
+			-my.halfsize, -my.halfsize, -my.halfsize,
+			-my.halfsize,  my.halfsize, -my.halfsize,
+			my.halfsize,  my.halfsize, -my.halfsize,
+			my.halfsize, -my.halfsize, -my.halfsize,
 			
 			// Top face
-			-my.size,  my.size, -my.size,
-			-my.size,  my.size,  my.size,
-			my.size,  my.size,  my.size,
-			my.size,  my.size, -my.size,
+			-my.halfsize,  my.halfsize, -my.halfsize,
+			-my.halfsize,  my.halfsize,  my.halfsize,
+			my.halfsize,  my.halfsize,  my.halfsize,
+			my.halfsize,  my.halfsize, -my.halfsize,
 			
 			// Bottom face
-			-my.size, -my.size, -my.size,
-			my.size, -my.size, -my.size,
-			my.size, -my.size,  my.size,
-			-my.size, -my.size,  my.size,
+			-my.halfsize, -my.halfsize, -my.halfsize,
+			my.halfsize, -my.halfsize, -my.halfsize,
+			my.halfsize, -my.halfsize,  my.halfsize,
+			-my.halfsize, -my.halfsize,  my.halfsize,
 			
 			// Right face
-			my.size, -my.size, -my.size,
-			my.size,  my.size, -my.size,
-			my.size,  my.size,  my.size,
-			my.size, -my.size,  my.size,
+			my.halfsize, -my.halfsize, -my.halfsize,
+			my.halfsize,  my.halfsize, -my.halfsize,
+			my.halfsize,  my.halfsize,  my.halfsize,
+			my.halfsize, -my.halfsize,  my.halfsize,
 			
 			// Left face
-			-my.size, -my.size, -my.size,
-			-my.size, -my.size,  my.size,
-			-my.size,  my.size,  my.size,
-			-my.size,  my.size, -my.size];
+			-my.halfsize, -my.halfsize, -my.halfsize,
+			-my.halfsize, -my.halfsize,  my.halfsize,
+			-my.halfsize,  my.halfsize,  my.halfsize,
+			-my.halfsize,  my.halfsize, -my.halfsize];
         my.gl.bufferData(my.gl.ARRAY_BUFFER, new Float32Array(vertices), my.gl.STATIC_DRAW);
         my.voxelVertexPositionBuffer.itemSize = 3;
         my.voxelVertexPositionBuffer.numItems = 24;

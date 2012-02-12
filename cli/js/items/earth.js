@@ -14,7 +14,7 @@ var earth = function(spec, my) {
 
     my.GL = spec.GL;
     my.voxel = voxel({GL: my.GL,
-		      size: spec.radius});
+		      halfsize: spec.radius});
     
     // public
     var init;    /* init(scene); */

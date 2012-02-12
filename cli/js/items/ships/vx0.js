@@ -18,11 +18,15 @@ var vx0 = function(spec, my) {
     spec.thrust = { push: 0.002, rot: 0.005 };
 
     my.GL = spec.GL;
-    my.size = 4;
-    my.shipvx = voxel({GL: my.GL,
-		       size: my.size});
+    my.ship = vxart({GL: my.GL,
+                     halfsize: 4.0,
+                     data: [ 
+    {p: [0.5, -0.5, 0],  c: [0, 1, 0, 1]},
+    {p: [-0.5, -0.5, 0], c: [0, 1, 0, 1]},
+    {p: [0, 0.5, 0],     c: [1, 0, 0, 1]}
+                             ]});
     my.simvx =  voxel({GL: my.GL,
-		       size: my.size / 2.0});
+		       halfsize: 2.0});
 
     // public
     var render;    /* render() */
@@ -35,17 +39,7 @@ var vx0 = function(spec, my) {
      * renders the object (step)
      */
     render = function() {	
-	my.shipvx.setColor([0, 1, 0, 1]);
-
-	mat4.translate(my.GL.mvMatrix(), [my.size, -my.size, 0.0]);	
-	my.shipvx.draw();
-	mat4.translate(my.GL.mvMatrix(), [-2*my.size, 0.0, 0.0]);	
-	my.shipvx.draw();
-
-	my.shipvx.setColor([1, 0, 0, 1]);
-
-	mat4.translate(my.GL.mvMatrix(), [my.size, 2*my.size, 0.0]);	
-	my.shipvx.draw();
+      my.ship.draw();
     };
 
     /**
