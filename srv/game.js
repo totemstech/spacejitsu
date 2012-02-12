@@ -5,6 +5,7 @@ var config = require('./../shared/config.js').config;
 
 var particle = require('./../shared/particle.js').particle;
 var body = require('./../shared/body.js').body;
+var planet = require('./../shared/planet.js').planet;
 var ship = require('./../shared/ship.js').ship;
 var missile = require('./../shared/missile.js').missile;
 
@@ -37,6 +38,24 @@ var game = function(spec, my) {
    */
   start = function() {
     my.gtimer = setInterval(step, config.STEP_TIME);	
+    
+    var earth = planet({ id: '0-0',
+                         owner: '0',
+                         model: 'earth',
+                         radius: config.PLANET_RADIUS['earth'] });
+    that.add(earth);                         
+
+    var moon = planet({ id: '0-1',
+                        owner: '0',
+                        model: 'moon',
+                        invmass: 0.01,
+                        rotation: 0.001,
+                        position: {x: (400) * Math.cos(Math.PI/100),
+                                   y: (400) * Math.sin(Math.PI/100) },
+                        velocity: {x: 0.3 * Math.sin(Math.PI/100),
+                                   y: 0.3 * Math.cos(Math.PI/100) },
+                        radius: config.PLANET_RADIUS['moon'] });
+    that.add(moon);                         
   };
 
   /**
@@ -105,16 +124,34 @@ var game = function(spec, my) {
         that.add(s);
         s.on('collide', function(p) {
             if(p.owner() !== s.owner()) {
-              that.emit('destroy', [s.id(), p.id()]);
+              if(p.type() !== config.PLANET_TYPE) {
+                that.emit('destroy', [s.id(), p.id()]);
+                that.remove(p.id());
+              }
+              else {
+                that.emit('destroy', [s.id()]);
+              }                
               that.remove(s.id());
-              that.remove(p.id());
             }
           });
         break;
       }
       case config.MISSILE_TYPE:
       {
-        that.add(missile(desc));
+        var m = missile(desc);
+        that.add(m);
+        m.on('collide', function(p) {
+            if(p.owner() !== m.owner()) {
+              if(p.type() !== config.PLANET_TYPE) {
+                that.emit('destroy', [m.id(), p.id()]);
+                that.remove(p.id());
+              }
+              else {
+                that.emit('destroy', [m.id()]);
+              }                
+              that.remove(m.id());
+            }
+          });
         break;
       }
       default:

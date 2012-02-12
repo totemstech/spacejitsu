@@ -9,8 +9,6 @@ var config = {
     STEP_TIME: 15,
     GM: 30,
     
-    EARTH_RADIUS: 150,
-
     GRID_SPACE: 100,
     GRID_COLOR: 0x444444,
     GRID_OPACITY: 0.4,
@@ -28,6 +26,7 @@ var config = {
 
     PARTICLE_TYPE: 'particle',
     BODY_TYPE: 'body',
+    PLANET_TYPE: 'planet',
     SHIP_TYPE: 'ship',
     MISSILE_TYPE: 'missile',
     
@@ -42,7 +41,9 @@ var config = {
 
     SIMULATION_LEN: 15,
     
-    MISSILE_REPETITION: { 'm0': 200 }
+    MISSILE_REPETITION: { 'm0': 200 },
+    PLANET_RADIUS: { 'earth': 150,
+                     'moon': 50 },
     
 };
 

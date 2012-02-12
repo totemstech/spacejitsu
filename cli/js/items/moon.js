@@ -1,16 +1,17 @@
 /**
- * Earth Object
+ * Moon Object
  *
  * @extends planet
  * 
  * @param spec {GL}
  */
-var earth = function(spec, my) {
+var moon = function(spec, my) {
     var my = my || {};
     var _super = {};
     
-    spec.model = 'earth';
-    spec.radius = config.PLANET_RADIUS['earth'];
+    spec.model = 'moon';
+    spec.radius = config.PLANET_RADIUS['moon'];
+    spec.invmass = 0.1;
 
     my.GL = spec.GL;
     my.voxel = voxel({GL: my.GL,

@@ -97,8 +97,6 @@ var game = function(spec, my) {
    * starts the game (engine, render, network)
    */
   start = function() {				
-    my.earth = earth({GL: my.GL});
-	
     my.gtimer = setInterval(step, config.STEP_TIME);
     my.utimer = setInterval(push, config.UPDATE_TIME);		    
 	
@@ -142,30 +140,58 @@ var game = function(spec, my) {
 	
     my.socket.on('create', function(data) {
         if(data.desc.owner !== my.id) {
-          if(data.desc.type === config.SHIP_TYPE) {
-            switch(data.desc.model) {
-            case 'vx0':
-              {
-                var spec = data.desc;
-                spec.GL = my.GL;
-                var s = vx0(spec);
-                that.add(s);
-                break;
+          switch(data.desc.type) {
+          case config.PLANET_TYPE:
+            {
+              switch(data.desc.model) {
+              case 'earth':
+                {
+                  var spec = data.desc;
+                  spec.GL = my.GL;
+                  var s = earth(spec);
+                  that.add(s);
+                  break;
+                }
+              case 'moon':
+                {
+                  var spec = data.desc;
+                  spec.GL = my.GL;
+                  var m = moon(spec);
+                  that.add(m);
+                  break;
+                }
               }
+              break;
+            }            
+          case config.SHIP_TYPE:
+            {
+              switch(data.desc.model) {
+              case 'vx0':
+                {
+                  var spec = data.desc;
+                  spec.GL = my.GL;
+                  var s = vx0(spec);
+                  that.add(s);
+                  break;
+                }
+              }
+              break;
+            }            
+          case config.MISSILE_TYPE:
+            {
+              switch(data.desc.model) {
+              case 'm0':
+                {
+                  var spec = data.desc;
+                  spec.GL = my.GL;
+                  var m = m0(spec);
+                  that.add(m);
+                  break;
+                }
+              }
+              break;
             }
           }
-          if(data.desc.type === config.MISSILE_TYPE) {
-            switch(data.desc.model) {
-            case 'm0':
-              {
-                var spec = data.desc;
-                spec.GL = my.GL;
-                var m = m0(spec);
-                that.add(m);
-                break;
-              }
-            }
-          }                    
         }
       });		
     my.socket.on('push', function(data) {
@@ -206,11 +232,6 @@ var game = function(spec, my) {
    */
   render = function() {
     my.GL.clear();
-
-    my.GL.mvPushMatrix();
-    mvTo(my.earth);
-    my.earth.render();
-    my.GL.mvPopMatrix();
 
     if(typeof my.ship !== 'undefined') {
       my.GL.mvPushMatrix();
