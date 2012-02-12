@@ -1,17 +1,22 @@
 if(typeof method === 'undefined')
-    var method = require('./base.js').method;
+  var method = require('./base.js').method;
 if(typeof getter === 'undefined')
-    var getter = require('./base.js').getter;
+  var getter = require('./base.js').getter;
 if(typeof setter === 'undefined')
-    var setter = require('./base.js').setter;
+  var setter = require('./base.js').setter;
 if(typeof config === 'undefined')
-    var config = require('./config.js').config;
+  var config = require('./config.js').config;
+
+if(typeof emitter === 'undefined')
+  var emitter = require('./event.js').emitter;
 
 
 /**
  * Particle Object
  *
- * @extends {}
+ * @extends emitter
+ *
+ * @emits clear 
  * 
  * @param spec {id, owner, type, invmass, position, velocity, radius}
  */
@@ -44,7 +49,7 @@ var particle = function(spec, my) {
     // protected
     var smooth;     /* smooth(a, b, force) */
 
-    var that = {};
+    var that = emitter(spec, my);
 
     /** 
      * applies the force f to the particle
@@ -130,6 +135,7 @@ var particle = function(spec, my) {
      * do anything necessary when cleared from simu
      */
     clear = function() {
+      that.emit('clear');
     };
 
     /**

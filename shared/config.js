@@ -23,11 +23,13 @@ var config = {
 
     DEFAULT_THRUST: { push: 0.002, rot: 0.005 },
     DEFAULT_MODEL: 'nomodel',
+    DEFAULT_LIFESPAN: 1000*60*60*24*365,
+    DEFAULT_MISSILE: 'nomissile',
 
     PARTICLE_TYPE: 'particle',
     BODY_TYPE: 'body',
     SHIP_TYPE: 'ship',
-    SHOOT_TYPE: 'shoot',
+    MISSILE_TYPE: 'missile',
     
     INPUT_UP: 'u',
     INPUT_DOWN: 'd',
@@ -39,6 +41,9 @@ var config = {
     SERVER_SIDE: (typeof module !== 'undefined' && module.exports),
 
     SIMULATION_LEN: 15,
+    
+    MISSILE_REPETITION: { 'm0': 200 }
+    
 };
 
 exports.config = config;

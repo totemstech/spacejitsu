@@ -3,16 +3,19 @@
  *
  * @extends ship
  * 
- * @param spec {invmass, invinertia, 
+ * @param spec {id, owner, 
  *              position, orientation,
- *              velocity, rotation,
- *              radius, thrust, GL}
+ *              velocity, rotation, GL}
  */
 var vx0 = function(spec, my) {
     var my = my || {};
     var _super = {};
 
-    spec.model = spec.model || 'vx0';    
+    spec.model = 'vx0';    
+    spec.invmass = 0.2;
+    spec.invinertia = 2.002;
+    spec.radius = 15;
+    spec.thrust = { push: 0.002, rot: 0.005 };
 
     my.GL = spec.GL;
     my.size = 4;
@@ -32,7 +35,6 @@ var vx0 = function(spec, my) {
      * renders the object (step)
      */
     render = function() {	
-
 	my.shipvx.setColor([0, 1, 0, 1]);
 
 	mat4.translate(my.GL.mvMatrix(), [my.size, -my.size, 0.0]);	
@@ -63,12 +65,7 @@ var vx0 = function(spec, my) {
 	}
     }
 
-    clear = function() {
-	_super.clear();
-    };
-
     method(that, 'render', render, _super);
-    method(that, 'clear', clear, _super);
     method(that, 'simulate', simulate, _super);
 
     return that;

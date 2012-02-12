@@ -1,4 +1,4 @@
 #!/bin/sh
 
-rm -rf cli/shared
+./clean.sh
 cp -R shared cli/

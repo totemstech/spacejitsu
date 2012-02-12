@@ -2,3 +2,4 @@
 
 ./build.sh
 jitsu deploy
+./clean.sh
