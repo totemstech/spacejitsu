@@ -16,7 +16,7 @@ var world = require('./../shared/world.js').world;
  * 
  * @extends world
  *
- * @param spec {}
+ * @param spec {io}
  */
 var game = function(spec, my) {
   var my = my || {};
@@ -32,6 +32,8 @@ var game = function(spec, my) {
   var step;   /* step(); */
 
   var that = world(spec, my);
+
+  my.io = spec.io;
 
   /**
    * starts the game (engine, render, network)
@@ -56,6 +58,11 @@ var game = function(spec, my) {
                                    y: 0.3 * Math.cos(Math.PI/100) },
                         radius: config.PLANET_RADIUS['moon'] });
     that.add(moon);                         
+    // moon update
+    my.utimer = setInterval(function() {
+        my.io.of('/game').volatile.emit('push', { id: moon.id(),
+                                                  st: moon.state() });
+      }, config.UPDATE_TIME);
   };
 
   /**

@@ -41,11 +41,15 @@ var game = function(spec, my) {
    * pushes my.ship state
    */
   push = function() {
-    if(typeof my.ship !== 'undefined') {
-      //console.log('pushing: ' + JSON.stringify(my.ship.state()));
-      my.socket.emit('push', { id: my.ship.id(), 
-                               st: my.ship.state() });
-    }	
+    if(that.owners()[my.id]) {
+      for(var i = 0; i < that.owners()[my.id].length; i ++) {
+        var id = that.owners()[my.id][i];
+        var p = that.idx()[id];
+        if(p) {
+          my.socket.emit('push', { id: p.id(), st: p.state() });
+        }
+      }
+    }
   };
     
   /**
@@ -109,12 +113,13 @@ var game = function(spec, my) {
     my.socket.on('init', function(data) {
         my.id = data.id;
         // ship buildup
+        var r = Math.floor(Math.random() * 2 * Math.PI);
         my.ship = vx0({ id: gid(),
                         owner: my.id,
-                        position: {x: (400) * Math.cos(Math.PI/100),
-                                   y: (400) * Math.sin(Math.PI/100) },
-                        velocity: {x: 0.3 * Math.sin(Math.PI/100),
-                                   y: 0.3 * Math.cos(Math.PI/100) },
+                        position: {x: (800) * Math.cos(r),
+                                   y: (800) * Math.sin(r) },
+                        velocity: {x: 0.1 * Math.cos(r),
+                                   y: 0.1 * Math.sin(r) },
                         missile: 'm0',
                         GL: my.GL });
         that.add(my.ship);
@@ -195,7 +200,7 @@ var game = function(spec, my) {
         }
       });		
     my.socket.on('push', function(data) {
-        if(that.idx()[data.id] !== 'undefined' &&
+        if(typeof that.idx()[data.id] !== 'undefined' &&
            that.idx()[data.id].owner() !== my.id) {
           that.idx()[data.id].update(data.st);
         }
@@ -208,8 +213,9 @@ var game = function(spec, my) {
       });	
     my.socket.on('destroy', function(data) {
         for(var i = 0; i < data.length; i ++) {          
-          if(data[i] === my.ship.id())
-            delete my.ship;          
+          if(typeof my.ship !== 'undefined' &&
+             data[i] === my.ship.id())
+            delete my.ship;
           if(that.idx()[data[i]] !== 'undefined') {
             that.idx()[data[i]].destroy();
           }

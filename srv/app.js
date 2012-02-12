@@ -14,7 +14,7 @@ app.configure(function(){
 io.set('log level', 1);
 
 var incr = 0;
-var game = require('./game.js').game({});
+var game = require('./game.js').game({io: io});
 
 game.start();
 
