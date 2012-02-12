@@ -207,10 +207,12 @@ var game = function(spec, my) {
         that.clear(data.id);	     
       });	
     my.socket.on('destroy', function(data) {
-        for(var i = 0; i < data.length; i ++) {
+        for(var i = 0; i < data.length; i ++) {          
           if(data[i] === my.ship.id())
-            delete my.ship;
-          that.remove(data[i]);
+            delete my.ship;          
+          if(that.idx()[data[i]] !== 'undefined') {
+            that.idx()[data[i]].destroy();
+          }
         }
       });		    		    
   };

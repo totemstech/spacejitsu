@@ -45,6 +45,7 @@ var particle = function(spec, my) {
     var update;     /* update(state) */
 
     var collide;    /* collide(p) */
+    var destroy;    /* destroy() */
 
     var clear;      /* clear() */
 
@@ -144,6 +145,14 @@ var particle = function(spec, my) {
     };
 
     /**
+     * called on destruction, emits an event for that
+     */
+    destroy = function() {
+      that.emit('destroy');
+    };
+
+
+    /**
      * do anything necessary when cleared from simu
      */
     clear = function() {
@@ -192,6 +201,7 @@ var particle = function(spec, my) {
     method(that, 'update', update);
 
     method(that, 'collide', collide);
+    method(that, 'destroy', destroy);
     method(that, 'clear', clear);
     
     method(that, 'smooth', smooth);

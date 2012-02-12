@@ -87,6 +87,12 @@ var ship = function(spec, my) {
     return false;
   };
 
+  that.on('destroy', function() {
+      if(my.shti)
+        clearInterval(my.shti);      
+    });
+
+
   /**
    * emits a shoot event with the necessary desc info to
    * create the new missile

@@ -126,12 +126,13 @@ var game = function(spec, my) {
             if(p.owner() !== s.owner()) {
               if(p.type() !== config.PLANET_TYPE) {
                 that.emit('destroy', [s.id(), p.id()]);
-                that.remove(p.id());
+                s.destroy();
+                p.destroy();
               }
               else {
                 that.emit('destroy', [s.id()]);
+                s.destroy();
               }                
-              that.remove(s.id());
             }
           });
         break;
