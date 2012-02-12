@@ -98,7 +98,6 @@ var ship = function(spec, my) {
                           y: my.position.y },
               velocity: { x: my.velocity.x + Math.cos(my.orientation + Math.PI / 2) * 0.3,
                           y: my.velocity.y + Math.sin(my.orientation + Math.PI / 2) * 0.3 } };
-    console.log(d.velocity);
     that.emit('shoot', d);
   };
 
@@ -122,7 +121,6 @@ var ship = function(spec, my) {
       }
     }
   };
-
   
   /**
    * returns the description of the body

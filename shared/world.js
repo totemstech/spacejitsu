@@ -49,6 +49,10 @@ var world = function(spec, my) {
     my.all.push(b);
     my.owners[b.owner()] = my.owners[b.owner()] || [];
     my.owners[b.owner()].push(b.id());
+    
+    b.on('destroy', function() {
+        that.remove(b.id());
+      });
   };
 
   /**
@@ -56,21 +60,23 @@ var world = function(spec, my) {
    * @param id particle or subclass id
    */
   remove = function(id) {
-    var o = my.owners[my.idx[id].owner()];
-    for(var i = 0; i < o.length; i++) {
-      if(o[i] === id) {
-        o.splice(i, 1);
-        break;
-      }	    
-    }
-    for(var i = 0; i < my.all.length; i++) {
-      if(my.all[i].id() === id) {
-        my.all[i].clear();
-        my.all.splice(i, 1);
-        break;
+    if(my.idx[id]) {
+      var o = my.owners[my.idx[id].owner()];
+      for(var i = 0; i < o.length; i++) {
+        if(o[i] === id) {
+          o.splice(i, 1);
+          break;
+        }	    
       }
+      for(var i = 0; i < my.all.length; i++) {
+        if(my.all[i].id() === id) {
+          my.all[i].clear();
+          my.all.splice(i, 1);
+          break;
+        }
+      }
+      delete my.idx[id];
     }
-    delete my.idx[id];
   };
 
   /** 
@@ -107,7 +113,7 @@ var world = function(spec, my) {
 
   /**
    * step function to advance in time
-   */
+    */
   step = function() {
     var d = 0;
     if(typeof my.last !== 'undefined')
@@ -117,6 +123,18 @@ var world = function(spec, my) {
     if(d > 2 * config.STEP_TIME) 
       d = config.STEP_TIME;
 
+
+    // collision detection
+    var collide = function(a, b) {
+      var d = Math.sqrt((a.position().x - b.position().x) * (a.position().x - b.position().x) +
+                        (a.position().y - b.position().y) * (a.position().y - b.position().y));
+      if(d <= a.radius() + b.radius()) {
+        a.collide(b);
+        b.collide(a);
+      }
+    };
+
+    // physics simulation
     var process = function(a) {
       // gravity
       if(a.invmass() != 0) {
@@ -142,8 +160,12 @@ var world = function(spec, my) {
         pos.y += 2 * config.HALFSIZE_Y;	    
     };
 
+    // main loop
     for(var i = 0; i < my.all.length; i ++) {
       process(my.all[i]);
+      for(var j = i+1; j < my.all.length; j ++) {
+        collide(my.all[i], my.all[j]);
+      }
     }
 	
     my.last = new Date();	

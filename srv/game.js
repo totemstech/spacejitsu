@@ -101,16 +101,20 @@ var game = function(spec, my) {
       }
       case config.SHIP_TYPE:
       {
-        that.add(ship(desc));
+        var s = ship(desc);
+        that.add(s);
+        s.on('collide', function(p) {
+            if(p.owner() !== s.owner()) {
+              that.emit('destroy', [s.id(), p.id()]);
+              that.remove(s.id());
+              that.remove(p.id());
+            }
+          });
         break;
       }
       case config.MISSILE_TYPE:
       {
-        var m = missile(desc);
-        that.add(m);
-        m.on('destroy', function() {
-            that.remove(m.id());
-          });      
+        that.add(missile(desc));
         break;
       }
       default:

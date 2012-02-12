@@ -44,6 +44,8 @@ var particle = function(spec, my) {
     var state;      /* state() */
     var update;     /* update(state) */
 
+    var collide;    /* collide(p) */
+
     var clear;      /* clear() */
 
     // protected
@@ -117,18 +119,28 @@ var particle = function(spec, my) {
      */
     update = function(s, force) {
 	if(typeof s.p !== 'undefined') {
-	    var d = Math.sqrt((my.position.x - s.p.x) * (my.position.x - s.p.x) +
-			      (my.position.y - s.p.y) * (my.position.y - s.p.y));
-	    if(d > config.SNAP_THRESHOLD) {
-		my.position = s.p;
-	    }
-	    else {
-		my.position.x = that.smooth(my.position.x, s.p.x, force);
-		my.position.y = that.smooth(my.position.y, s.p.y, force);
-	    }
+          var d = Math.sqrt((my.position.x - s.p.x) * (my.position.x - s.p.x) +
+                            (my.position.y - s.p.y) * (my.position.y - s.p.y));
+          if(d > config.SNAP_THRESHOLD) {
+            my.position = s.p;
+          }
+          else {
+            my.position.x = that.smooth(my.position.x, s.p.x, force);
+            my.position.y = that.smooth(my.position.y, s.p.y, force);
+          }
 	}
-	if(typeof s.v !== 'undefined')
-	    my.velocity = s.v;
+	if(typeof s.v !== 'undefined') {
+	    my.velocity.x = s.v.x;
+            my.velocity.y = s.v.y;
+        }
+    };
+
+    /**
+     * called when collision engine detects a collision with
+     * another particle
+     */
+    collide = function(p) {
+      that.emit('collide', p);
     };
 
     /**
@@ -179,6 +191,7 @@ var particle = function(spec, my) {
     method(that, 'state', state);
     method(that, 'update', update);
 
+    method(that, 'collide', collide);
     method(that, 'clear', clear);
     
     method(that, 'smooth', smooth);

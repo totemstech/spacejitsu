@@ -123,8 +123,6 @@ var game = function(spec, my) {
         my.socket.emit('create', { desc: my.ship.desc() });
 
         my.ship.on('shoot', function(d) {
-            console.log('SHOOT');
-            //console.log(d);
             switch(d.model) {
             case 'm0':
               {
@@ -134,16 +132,12 @@ var game = function(spec, my) {
                              velocity: d.velocity,
                              GL: my.GL });
                 that.add(m);
-                m.on('destroy', function() {
-                    that.remove(m.id());
-                  });
                 my.socket.emit('create', { desc: m.desc() });
                 break;
               }
             default:
             }
-          });
-		
+          });		
       });	
 	
     my.socket.on('create', function(data) {
@@ -168,9 +162,6 @@ var game = function(spec, my) {
                 spec.GL = my.GL;
                 var m = m0(spec);
                 that.add(m);
-                m.on('destroy', function() {
-                    that.remove(m.id());
-                  });
                 break;
               }
             }
@@ -179,8 +170,7 @@ var game = function(spec, my) {
       });		
     my.socket.on('push', function(data) {
         if(that.idx()[data.id] !== 'undefined' &&
-           (that.idx()[data.id].owner() !== my.id ||
-            that.idx()[data.id].type() === config.MISSILE_TYPE)) {                  
+           that.idx()[data.id].owner() !== my.id) {
           that.idx()[data.id].update(data.st);
         }
       });	
@@ -188,11 +178,14 @@ var game = function(spec, my) {
         // [ids]
       });	
     my.socket.on('kill', function(data) {
-        console.log('KILL');
         that.clear(data.id);	     
       });	
-    my.socket.on('explode', function(data) {
-        // [ids]
+    my.socket.on('destroy', function(data) {
+        for(var i = 0; i < data.length; i ++) {
+          if(data[i] === my.ship.id())
+            delete my.ship;
+          that.remove(data[i]);
+        }
       });		    		    
   };
 

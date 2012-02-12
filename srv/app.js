@@ -11,7 +11,7 @@ app.configure(function(){
 	app.use(express.static(__dirname + '/../cli'));
     });
 
-io.set('log level', 3);
+io.set('log level', 1);
 
 var incr = 0;
 var game = require('./game.js').game({});
@@ -55,6 +55,10 @@ io.of('/game').on('connection', function(socket) {
 	    });
     });
 
+
+game.on('destroy', function(ids) {
+    io.of('/game').emit('destroy', ids);
+  });
 
 app.listen(8080);
 
