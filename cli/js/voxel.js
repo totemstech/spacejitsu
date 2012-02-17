@@ -48,6 +48,7 @@ var voxel = function(spec, my) {
      * Draws the voxel using the current GL matrix context
      */
     draw = function() {
+        my.gl.uniform1i(my.GL.shader().useTextureUniform, 1);
 	my.gl.bindBuffer(my.gl.ARRAY_BUFFER, my.voxelVertexPositionBuffer);
         my.gl.vertexAttribPointer(my.GL.shader().vertexPositionAttribute, 
 				  my.voxelVertexPositionBuffer.itemSize, my.gl.FLOAT, false, 0, 0);

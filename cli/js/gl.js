@@ -20,24 +20,43 @@ var GL = function(spec, my) {
 	basic: { fs: 
 		 'precision mediump float;' + 
 		 '' +
+                 'varying vec2 vTextureCoord;' +
 		 'varying vec4 vColor;' +
+                 '' +
+                 'uniform sampler2D uSampler;' +
+                 'uniform bool uUseTexture;' +
 		 '' +
 		 'void main(void) {' +
-		 '    gl_FragColor = vec4(vColor.rgb, vColor.a);' +
+                 '    if(!uUseTexture) {' +
+		 '      gl_FragColor = vec4(vColor.rgb, vColor.a);' +
+                 '    } else {' +
+		 '      gl_FragColor = vec4(vColor.rgb, vColor.a);' +
+                 //'      gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));' +
+                 '    }' +
 		 '}',
 		 vs:
 		 'attribute vec3 aVertexPosition;' +
 		 'attribute vec3 aVertexNormal;' +
 		 'attribute vec4 aVertexColor;' +
+                 'attribute vec2 aTextureCoord;' +
 		 '' +
 		 'uniform mat4 uMVMatrix;' +
 		 'uniform mat4 uPMatrix;' +
 		 '' +
+                 'uniform bool uUseTexture;' +
+                 '' +
 		 'varying vec4 vColor;' +
+                 'varying vec2 vTextureCoord;' +
 		 '' +
 		 'void main(void) {' +
 		 '    gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);' +
-		 '    vColor = aVertexColor;' +
+                 '    if(!uUseTexture) {' +
+		 '      vColor = aVertexColor;' +
+                 '    } else {' +
+		 '      vColor = vec4(1, 1, 1, 1);' +
+		 //'      vColor = aVertexColor;' +
+                 //'      vTextureCoord = aTextureCoord;' +
+                 '    }' +
 		 '}' }
     };
     
@@ -134,6 +153,8 @@ var GL = function(spec, my) {
 
         my.shader.pMatrixUniform = my.gl.getUniformLocation(my.shader, "uPMatrix");
         my.shader.mvMatrixUniform = my.gl.getUniformLocation(my.shader, "uMVMatrix");
+        my.shader.useTextureUniform = my.gl.getUniformLocation(my.shader, "uUseTexture");
+        my.shader.samplerUniform = my.gl.getUniformLocation(my.shader, "uSampler");
 
 	my.gl.enable(my.gl.DEPTH_TEST);
 	my.gl.depthFunc(my.gl.LEQUAL);
