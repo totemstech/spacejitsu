@@ -24,14 +24,13 @@ var GL = function(spec, my) {
 		 'varying vec4 vColor;' +
                  '' +
                  'uniform sampler2D uSampler;' +
-                 'uniform bool uUseTexture;' +
+                 'uniform bool uHasTexture;' +
 		 '' +
 		 'void main(void) {' +
-                 '    if(!uUseTexture) {' +
+                 '    if(!uHasTexture) {' +
 		 '      gl_FragColor = vec4(vColor.rgb, vColor.a);' +
                  '    } else {' +
-		 '      gl_FragColor = vec4(vColor.rgb, vColor.a);' +
-                 //'      gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));' +
+                 '      gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));' +
                  '    }' +
 		 '}',
 		 vs:
@@ -43,19 +42,17 @@ var GL = function(spec, my) {
 		 'uniform mat4 uMVMatrix;' +
 		 'uniform mat4 uPMatrix;' +
 		 '' +
-                 'uniform bool uUseTexture;' +
+                 'uniform bool uHasTexture;' +
                  '' +
 		 'varying vec4 vColor;' +
                  'varying vec2 vTextureCoord;' +
 		 '' +
 		 'void main(void) {' +
 		 '    gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);' +
-                 '    if(!uUseTexture) {' +
+                 '    if(!uHasTexture) {' +
 		 '      vColor = aVertexColor;' +
                  '    } else {' +
-		 '      vColor = vec4(1, 1, 1, 1);' +
-		 //'      vColor = aVertexColor;' +
-                 //'      vTextureCoord = aTextureCoord;' +
+                 '      vTextureCoord = aTextureCoord;' +
                  '    }' +
 		 '}' }
     };
@@ -153,7 +150,7 @@ var GL = function(spec, my) {
 
         my.shader.pMatrixUniform = my.gl.getUniformLocation(my.shader, "uPMatrix");
         my.shader.mvMatrixUniform = my.gl.getUniformLocation(my.shader, "uMVMatrix");
-        my.shader.useTextureUniform = my.gl.getUniformLocation(my.shader, "uUseTexture");
+        my.shader.hasTextureUniform = my.gl.getUniformLocation(my.shader, "uHasTexture");
         my.shader.samplerUniform = my.gl.getUniformLocation(my.shader, "uSampler");
 
 	my.gl.enable(my.gl.DEPTH_TEST);
