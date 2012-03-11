@@ -63,7 +63,7 @@ var GL = function(spec, my) {
   my.mvMatrix = mat4.create();
   my.pMatrix = mat4.create();
   my.mvMatrixStack = [];
-
+  
   // public
   var setMatrixUniforms;
   var mvPushMatrix;
@@ -202,7 +202,6 @@ var GL = function(spec, my) {
   getter(that, 'shader', my, 'shader');
   getter(that, 'gl', my, 'gl');
 
-  getter(that, 'fov', my, 'fov');
   getter(that, 'near', my, 'near');
   getter(that, 'far', my, 'far');
   setter(that, 'fov', my, 'fov');

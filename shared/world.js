@@ -154,10 +154,10 @@ var world = function(spec, my) {
         pos.x -=  2 * config.HALFSIZE_X;
       if(pos.x < -config.HALFSIZE_X)
         pos.x += 2 * config.HALFSIZE_X;
-      if(pos.y > config.HALFSIZE_Y)
-        pos.y -=  2 * config.HALFSIZE_Y;
-      if(pos.y < -config.HALFSIZE_Y)
-        pos.y += 2 * config.HALFSIZE_Y;	    
+      if(pos.y > config.HALFSIZE_X * config.RATIO)
+        pos.y -=  2 * config.HALFSIZE_X * config.RATIO;
+      if(pos.y < -config.HALFSIZE_X * config.RATIO)
+        pos.y += 2 * config.HALFSIZE_X * config.RATIO;	    
     };
 
     // main loop
