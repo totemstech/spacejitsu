@@ -5,7 +5,7 @@ var config = {
   
   RATIO: 9 / 16,
   
-  HALFSIZE_X: 2000,
+  HALFSIZE_X: 2600,
   
   STEP_TIME: 15,
   GM: 30,

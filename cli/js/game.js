@@ -15,7 +15,7 @@ var game = function(spec, my) {
                fov: 45,
                near: 500,
                far: 4500,
-               pos: [0, 0, -3400] });
+               pos: [0, 0, -3525] });
 
   my.ship = undefined;
   my.rockets = undefined;
