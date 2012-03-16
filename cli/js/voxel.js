@@ -63,9 +63,9 @@ var voxel = function(spec, my) {
     my.gl.vertexAttribPointer(my.GL.shader().vertexColorAttribute, 
                               my.voxelVertexColorBuffer.itemSize, my.gl.FLOAT, false, 0, 0);
 
-    //my.gl.activeTexture(my.gl.TEXTURE0);
-    //my.gl.bindTexture(my.gl.TEXTURE_2D, my.texture);
-    //my.gl.uniform1i(my.GL.shader().samplerUniform, 0);    
+    my.gl.activeTexture(my.gl.TEXTURE0);
+    my.gl.bindTexture(my.gl.TEXTURE_2D, my.texture);
+    my.gl.uniform1i(my.GL.shader().samplerUniform, 0);    
 
     my.gl.bindBuffer(my.gl.ELEMENT_ARRAY_BUFFER, my.voxelVertexIndexBuffer);
     my.GL.setMatrixUniforms();
@@ -121,12 +121,16 @@ var voxel = function(spec, my) {
     my.voxelVertexTextureCoordBuffer.numItems = 24;
 
     my.texture = my.gl.createTexture();
-    //my.gl.bindTexture(my.gl.TEXTURE_2D, my.texture);
-    //my.gl.pixelStorei(my.gl.UNPACK_FLIP_Y_WEBGL, true);
-    //my.gl.texImage2D(my.gl.TEXTURE_2D, 0, my.gl.RGBA, my.gl.RGBA, my.gl.UNSIGNED_BYTE, texture.image);
-    //my.gl.texParameteri(my.gl.TEXTURE_2D, my.gl.TEXTURE_MAG_FILTER, my.gl.NEAREST);
-    //my.gl.texParameteri(my.gl.TEXTURE_2D, my.gl.TEXTURE_MIN_FILTER, my.gl.NEAREST);
-    //my.gl.bindTexture(my.gl.TEXTURE_2D, null);
+    my.texture.image = new Image();
+    my.texture.image.src = '/img/moon.gif';
+    my.texture.image.onload = function() {
+      my.gl.bindTexture(my.gl.TEXTURE_2D, my.texture);
+      my.gl.pixelStorei(my.gl.UNPACK_FLIP_Y_WEBGL, true);
+      my.gl.texImage2D(my.gl.TEXTURE_2D, 0, my.gl.RGBA, my.gl.RGBA, my.gl.UNSIGNED_BYTE, my.texture.image);
+      my.gl.texParameteri(my.gl.TEXTURE_2D, my.gl.TEXTURE_MAG_FILTER, my.gl.NEAREST);
+      my.gl.texParameteri(my.gl.TEXTURE_2D, my.gl.TEXTURE_MIN_FILTER, my.gl.NEAREST);
+      my.gl.bindTexture(my.gl.TEXTURE_2D, null);
+    };
   };
 
 
@@ -174,7 +178,7 @@ var voxel = function(spec, my) {
     my.voxelVertexPositionBuffer.itemSize = 3;
     my.voxelVertexPositionBuffer.numItems = 24;
     
-    setColor([1.0, 1.0, 1.0, 1.0]);
+    //setColor([1.0, 1.0, 1.0, 1.0]);
     initTexture();
 
     my.gl.bindBuffer(my.gl.ELEMENT_ARRAY_BUFFER, my.voxelVertexIndexBuffer);

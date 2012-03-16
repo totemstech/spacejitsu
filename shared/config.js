@@ -43,7 +43,7 @@ var config = {
   SIMULATION_LEN: 15,
   
   MISSILE_REPETITION: { 'm0': 200 },
-  PLANET_RADIUS: { 'earth': 150,
+  PLANET_RADIUS: { 'earth': 200,
                    'moon': 50 },
   
 };

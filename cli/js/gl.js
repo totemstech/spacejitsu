@@ -15,7 +15,36 @@ var GL = function(spec, my) {
   my.pos = spec.pos || [0, 0, -10];
 
   my.stype = spec.stype || 'basic'
-
+  
+  /*
+  my.shaders = {
+    basic: { fs: 
+	     'precision mediump float;' +
+             '' +
+             'varying vec2 vTextureCoord;' +
+             '' +
+             'uniform sampler2D uSampler;' +
+             '' +
+             'void main(void) {' +
+             '  gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));' +
+             '}',
+	     vs:
+	     'attribute vec3 aVertexPosition;' +
+             'attribute vec2 aTextureCoord;' +
+             '' +
+             'uniform mat4 uMVMatrix;' +
+             'uniform mat4 uPMatrix;' +
+             '' +
+             'varying vec2 vTextureCoord;' +
+             '' +
+             'void main(void) {' +
+             '  gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);' +
+             '  vTextureCoord = aTextureCoord;' +
+             '}' }
+  };
+  //*/
+  
+  ///*
   my.shaders = {
     basic: { fs: 
 	     'precision mediump float;' + 
@@ -29,6 +58,7 @@ var GL = function(spec, my) {
 	     'void main(void) {' +
              '    if(!uHasTexture) {' +
 	     '      gl_FragColor = vec4(vColor.rgb, vColor.a);' +
+             '      gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));' +
              '    } else {' +
              '      gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));' +
              '    }' +
@@ -51,12 +81,14 @@ var GL = function(spec, my) {
 	     '    gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);' +
              '    if(!uHasTexture) {' +
 	     '      vColor = aVertexColor;' +
+             '      vTextureCoord = aTextureCoord;' +
              '    } else {' +
+             //'      vColor = vec4(0.5, 0.5, 0.5, 1.0);' +
              '      vTextureCoord = aTextureCoord;' +
              '    }' +
 	     '}' }
   };
-  
+  //*/
   
   my.canvas = spec.canvas;
 
