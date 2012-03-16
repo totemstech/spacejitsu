@@ -11,7 +11,8 @@ var earth = function(spec, my) {
   
   spec.model = 'earth';
   spec.radius = config.PLANET_RADIUS['earth'];
-  
+  spec.rotation = 0.0002;
+
   my.GL = spec.GL;
 
   my.sphere = sphere({GL: my.GL,
