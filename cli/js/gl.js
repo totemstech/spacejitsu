@@ -24,10 +24,10 @@ var GL = function(spec, my) {
 	     'varying vec4 vColor;' +
              '' +
              'uniform sampler2D uSampler;' +
-             'uniform bool uHasTexture;' +
+             'uniform int uHasTexture;' +
 	     '' +
 	     'void main(void) {' +
-             '    if(!uHasTexture) {' +
+             '    if(uHasTexture == 0) {' +
 	     '      gl_FragColor = vec4(vColor.rgb, vColor.a);' +
              '    } else {' +
              '      gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));' +
@@ -42,14 +42,14 @@ var GL = function(spec, my) {
 	     'uniform mat4 uMVMatrix;' +
 	     'uniform mat4 uPMatrix;' +
 	     '' +
-             'uniform bool uHasTexture;' +
+             'uniform int uHasTexture;' +
              '' +
 	     'varying vec4 vColor;' +
              'varying vec2 vTextureCoord;' +
 	     '' +
 	     'void main(void) {' +
 	     '    gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);' +
-             '    if(!uHasTexture) {' +
+             '    if(uHasTexture == 0) {' +
 	     '      vColor = aVertexColor;' +
              '    } else {' +
              '      vTextureCoord = aTextureCoord;' +

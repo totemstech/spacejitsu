@@ -3,7 +3,7 @@
  *
  * @extends {}
  * 
- * @param spec {GL, latbands[30], lngbands[30], radius[5], textureLink[earth], useTexture[true]}
+ * @param spec {GL, latbands[30], lngbands[30], radius[5], textureLink[earth], useTexture[false]}
  */
 var sphere = function(spec, my) {
   var my = my || {};
@@ -16,7 +16,11 @@ var sphere = function(spec, my) {
   my.latbands = spec.latbands || 30;
   my.lngbands = spec.lngbands || 30;
 
-  my.textured = spec.useTexture || true;
+  if(spec.useTexture)
+    my.textured = 1;
+  else
+    my.textured = 0;
+
   my.textureLink = spec.textureLink || '/img/earth.gif';
 
   my.sphereVertexPositionBuffer = my.gl.createBuffer();

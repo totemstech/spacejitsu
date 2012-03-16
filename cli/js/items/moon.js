@@ -17,7 +17,8 @@ var moon = function(spec, my) {
 
   my.sphere = sphere({GL: my.GL,
                       radius: spec.radius,
-                      textureLink: '/img/moon.gif'});
+                      textureLink: '/img/moon.gif',
+                      useTexture: true});
   
   // public
   var init;    /* init(scene); */

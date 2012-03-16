@@ -16,7 +16,8 @@ var earth = function(spec, my) {
 
   my.sphere = sphere({GL: my.GL,
                       radius: spec.radius,
-                      textureLink: '/img/earth.gif'});                      
+                      textureLink: '/img/earth.gif',
+                      useTexture: true});                      
 
   // public
   var init;    /* init(scene); */
