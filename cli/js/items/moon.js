@@ -12,6 +12,8 @@ var moon = function(spec, my) {
   spec.model = 'moon';
   spec.radius = config.PLANET_RADIUS['moon'];
   spec.invmass = 0.1;
+  spec.latbands = 5;
+  spec.lngbands = 5;
   
   my.GL = spec.GL;
 

@@ -14,7 +14,6 @@ var voxel = function(spec, my) {
   my.halfsize = spec.halfsize || 5.0;
   
   my.voxelVertexPositionBuffer = my.gl.createBuffer();
-  my.voxelVertexTextureCoordBuffer = my.gl.createBuffer();
   my.voxelVertexColorBuffer = my.gl.createBuffer();
   my.voxelVertexIndexBuffer = my.gl.createBuffer();
   
@@ -23,7 +22,6 @@ var voxel = function(spec, my) {
   var draw;        /* draw() */
   
   // private;
-  var initTexture; /* initTexture() */
   var init;
   
   var that = {};
@@ -55,82 +53,15 @@ var voxel = function(spec, my) {
     my.gl.vertexAttribPointer(my.GL.shader().vertexPositionAttribute, 
                               my.voxelVertexPositionBuffer.itemSize, my.gl.FLOAT, false, 0, 0);
     
-    my.gl.bindBuffer(my.gl.ARRAY_BUFFER, my.voxelVertexTextureCoordBuffer);
-    my.gl.vertexAttribPointer(my.GL.shader().textureCoordAttribute, 
-                              my.voxelVertexTextureCoordBuffer.itemSize, my.gl.FLOAT, false, 0, 0);
-
     my.gl.bindBuffer(my.gl.ARRAY_BUFFER, my.voxelVertexColorBuffer);
     my.gl.vertexAttribPointer(my.GL.shader().vertexColorAttribute, 
                               my.voxelVertexColorBuffer.itemSize, my.gl.FLOAT, false, 0, 0);
 
-    my.gl.activeTexture(my.gl.TEXTURE0);
-    my.gl.bindTexture(my.gl.TEXTURE_2D, my.texture);
     my.gl.uniform1i(my.GL.shader().samplerUniform, 0);    
 
     my.gl.bindBuffer(my.gl.ELEMENT_ARRAY_BUFFER, my.voxelVertexIndexBuffer);
     my.GL.setMatrixUniforms();
     my.gl.drawElements(my.gl.TRIANGLES, my.voxelVertexIndexBuffer.numItems, my.gl.UNSIGNED_SHORT, 0);	
-  };
-
-
-  /**
-   * Inits the Texture buffers of the current voxel
-   * No texture is used but the buffers are necessary
-   */
-  initTexture = function() {
-    my.gl.bindBuffer(my.gl.ARRAY_BUFFER, my.voxelVertexTextureCoordBuffer);
-    var textureCoords = [
-      // Front face
-      0.0, 0.0,
-      1.0, 0.0,
-      1.0, 1.0,
-      0.0, 1.0,
-      
-      // Back face
-      1.0, 0.0,
-      1.0, 1.0,
-      0.0, 1.0,
-      0.0, 0.0,
-      
-      // Top face
-      0.0, 1.0,
-      0.0, 0.0,
-      1.0, 0.0,
-      1.0, 1.0,
-      
-      // Bottom face
-      1.0, 1.0,
-      0.0, 1.0,
-      0.0, 0.0,
-      1.0, 0.0,
-      
-      // Right face
-      1.0, 0.0,
-      1.0, 1.0,
-      0.0, 1.0,
-      0.0, 0.0,
-      
-      // Left face
-      0.0, 0.0,
-      1.0, 0.0,
-      1.0, 1.0,
-      0.0, 1.0,
-    ];
-    my.gl.bufferData(my.gl.ARRAY_BUFFER, new Float32Array(textureCoords), my.gl.STATIC_DRAW);
-    my.voxelVertexTextureCoordBuffer.itemSize = 2;
-    my.voxelVertexTextureCoordBuffer.numItems = 24;
-
-    my.texture = my.gl.createTexture();
-    my.texture.image = new Image();
-    my.texture.image.src = '/img/moon.gif';
-    my.texture.image.onload = function() {
-      my.gl.bindTexture(my.gl.TEXTURE_2D, my.texture);
-      my.gl.pixelStorei(my.gl.UNPACK_FLIP_Y_WEBGL, true);
-      my.gl.texImage2D(my.gl.TEXTURE_2D, 0, my.gl.RGBA, my.gl.RGBA, my.gl.UNSIGNED_BYTE, my.texture.image);
-      my.gl.texParameteri(my.gl.TEXTURE_2D, my.gl.TEXTURE_MAG_FILTER, my.gl.NEAREST);
-      my.gl.texParameteri(my.gl.TEXTURE_2D, my.gl.TEXTURE_MIN_FILTER, my.gl.NEAREST);
-      my.gl.bindTexture(my.gl.TEXTURE_2D, null);
-    };
   };
 
 
@@ -179,7 +110,6 @@ var voxel = function(spec, my) {
     my.voxelVertexPositionBuffer.numItems = 24;
     
     //setColor([1.0, 1.0, 1.0, 1.0]);
-    initTexture();
 
     my.gl.bindBuffer(my.gl.ELEMENT_ARRAY_BUFFER, my.voxelVertexIndexBuffer);
     var indices = [0, 1, 2,      0, 2, 3,    // Front face
