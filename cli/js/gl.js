@@ -15,7 +15,75 @@ var GL = function(spec, my) {
   my.pos = spec.pos || [0, 0, -10];
 
   my.stype = spec.stype || 'basic'
-  
+
+  /*****************************************************
+   * FOR LATER USE WITH LIGHING                        *
+   *****************************************************/
+  /*
+    my.shaders = {
+      basic: { fs: 
+               'precision mediump float;' + 
+                '' +
+                'varying vec2 vTextureCoord;' +
+                'varying vec4 vColor;' +
+                'varying vec3 vLightWeighting;' +
+                '' +
+                'uniform sampler2D uSampler;' +
+                'uniform bool uHasTexture;' +
+                '' +
+                'void main(void) {' +
+                '    if(!uHasTexture) {' +
+                '        gl_FragColor = vec4(vColor.rgb * vLightWeighting, vColor.a);' +
+                '    }' +
+                '    else {' +
+                '        vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));' +
+                '        gl_FragColor = vec4(textureColor.rgb * vLightWeighting, textureColor.a);' +
+                '    }' +
+               '}',
+               vs:
+                'attribute vec3 aVertexPosition;' +
+                'attribute vec3 aVertexNormal;' +
+                'attribute vec4 aVertexColor;' +
+                'attribute vec2 aTextureCoord;' +
+                '' +
+                'uniform mat4 uMVMatrix;' +
+                'uniform mat4 uPMatrix;' +
+                'uniform mat3 uNMatrix;' +
+                '' +
+                'uniform bool uHasTexture;' +
+                'uniform bool uUseLighting;' +
+                '' +
+                'uniform vec3 uAmbientColor;' +
+                '' +
+                'uniform vec3 uLightingDirection;' +
+                'uniform vec3 uDirectionalColor;' +
+                '' +
+                'varying vec2 vTextureCoord;' +
+                'varying vec3 vLightWeighting;' +
+                'varying vec4 vColor;' +
+                '' +
+                'void main(void) {' +
+                '    gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);' +
+                '' +
+                '    if(!uHasTexture) {' +
+                '        vColor = aVertexColor;' +
+                '    }' +
+                '    else {' +
+                '        vTextureCoord = aTextureCoord;' +
+                '    }' +
+                '' +
+                '    if (!uUseLighting) {' +
+                '        vLightWeighting = vec3(1.0, 1.0, 1.0);' +               
+                '    }' +
+                '    else {' +
+                '        vec3 transformedNormal = uNMatrix * aVertexNormal;' +
+                '        float directionalLightWeighting = max(dot(transformedNormal, uLightingDirection), 0.0);' +
+                '        vLightWeighting = uAmbientColor + uDirectionalColor * directionalLightWeighting;' +
+                '    }' +
+               '}' }
+    };
+*/
+
   my.shaders = {
     basic: { fs: 
 	     'precision mediump float;' + 

@@ -61,7 +61,7 @@ var sphere = function(spec, my) {
    * Draws the sphere using the current GL matrix context
    */
   draw = function() {
-    my.gl.uniform1i(my.GL.shader().hasTextureUniform, my.textured);
+    my.gl.uniform1i(my.GL.shader().hasTextureUniform, my.textured ? 1 : 0);
 
     my.gl.bindBuffer(my.gl.ARRAY_BUFFER, my.sphereVertexPositionBuffer);
     my.gl.vertexAttribPointer(my.GL.shader().vertexPositionAttribute, 
