@@ -30,8 +30,11 @@ var earth = function(spec, my) {
    * renders the object (step)
    */
   render = function() {
+    // earth readjustment
+    mat4.rotate(my.GL.mvMatrix(), Math.PI / 2.0, [1, 0, 0]);		
     my.sphere.draw();
   };
+
 
   method(that, 'render', render);
   method(that, 'init', init);
