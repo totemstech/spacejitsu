@@ -5,7 +5,7 @@
   "scripts": {
     "start": "./srv/app.js"
   },
-  "version": "0.1.0-44",
+  "version": "0.1.0-49",
   "dependencies": {
     "socket.io": "0.8.x",
     "express": "2.5.x"

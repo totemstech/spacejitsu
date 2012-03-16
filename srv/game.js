@@ -96,7 +96,6 @@ var game = function(spec, my) {
           that.emit('destroy', [that.all()[j].id()]);
           that.all()[j].destroy();
           that.remove(that.all()[j]);
-          console.log("sooo fast");
         }
       }
     }

@@ -14,7 +14,7 @@ var m0 = function(spec, my) {
     spec.model = 'm0';    
     spec.invmass = 0.02;
     spec.radius = 2;
-    spec.lifespan = 6000;
+    spec.lifespan = 3000;
 
     my.GL = spec.GL;
     my.vx = voxel({GL: my.GL,
