@@ -21,7 +21,6 @@ var world = require('./../shared/world.js').world;
 var game = function(spec, my) {
   var my = my || {};
   var _super = {};
-
   // public
   var start;  /* start(); */
   var stop;   /* stop(); */
@@ -34,7 +33,8 @@ var game = function(spec, my) {
   var that = world(spec, my);
 
   my.io = spec.io;
-
+  my.players = {};
+  
   /**
    * starts the game (engine, render, network)
    */
@@ -60,8 +60,8 @@ var game = function(spec, my) {
     that.add(moon);                         
     // moon update
     my.utimer = setInterval(function() {
-        my.io.of('/game').volatile.emit('push', { id: moon.id(),
-                                                  st: moon.state() });
+      my.io.of('/game').volatile.emit('push', { id: moon.id(),
+                                                st: moon.state() });
       }, config.UPDATE_TIME);
   };
 
@@ -143,21 +143,23 @@ var game = function(spec, my) {
       }
       case config.SHIP_TYPE:
       {
+        my.players[owner] = my.players[owner] || 
+          {owner: owner, score: 0, death:0};        
         var s = ship(desc);
         that.add(s);
         s.on('collide', function(p) {
-            if(p.owner() !== s.owner()) {
-              if(p.type() !== config.PLANET_TYPE) {
-                that.emit('destroy', [s.id(), p.id()]);
-                s.destroy();
-                p.destroy();
-              }
-              else {
-                that.emit('destroy', [s.id()]);
-                s.destroy();
-              }                
-            }
-          });
+          if(p.owner() !== s.owner()) {
+            my.players[s.owner()].death++;                
+            if(p.type() !== config.PLANET_TYPE) {
+              that.emit('destroy', [s.id(), p.id()]);
+              s.destroy();
+              p.destroy();              
+            } else {
+              that.emit('destroy', [s.id()]);
+              s.destroy();
+            }                
+          }
+        });
         break;
       }
       case config.MISSILE_TYPE:
@@ -165,22 +167,29 @@ var game = function(spec, my) {
         var m = missile(desc);
         that.add(m);
         m.on('collide', function(p) {
-            if(p.owner() !== m.owner()) {
-              if(p.type() !== config.PLANET_TYPE) {
-                that.emit('destroy', [m.id(), p.id()]);
-                that.remove(p.id());
-              }
-              else {
-                that.emit('destroy', [m.id()]);
-              }                
-              that.remove(m.id());
+          if(p.owner() !== m.owner()) {
+            if(p.type() !== config.PLANET_TYPE) {
+              that.emit('destroy', [m.id(), p.id()]);
+              that.remove(p.id());
             }
-          });
+            else {
+              that.emit('destroy', [m.id()]);
+            }                
+            that.remove(m.id());
+          }
+        });
         break;
       }
       default:
       }
     }
+  };
+  
+  getScore = function (id) {
+    if(id) {
+      return my.players[id];
+    }
+    return my.players;
   };
 
 
@@ -188,7 +197,7 @@ var game = function(spec, my) {
   method(that, 'stop', stop, _super);
   method(that, 'push', push);
   method(that, 'create', create);    
-
+  method(that, 'getScore', getScore, _super);
   method(that, 'step', step, _super);
     
   return that;

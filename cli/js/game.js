@@ -20,12 +20,12 @@ var game = function(spec, my) {
   my.ship = undefined;
   my.rockets = undefined;
   my.incr = 0;
-
+  
   // public
   var start;       /* start(); */
   var keydown;     /* keydown(evt) */
   var keyup;       /* keydown(evt) */
-
+  
   // protected
   var step;        /* step(); */
 
@@ -34,7 +34,7 @@ var game = function(spec, my) {
   var push;        /* push() */
   var gid;         /* gid() */
   var mvTo;        /* mvTo(body) */
-
+  var spone;
   var that = world(spec, my);
 
   /**
@@ -107,122 +107,97 @@ var game = function(spec, my) {
     render();		    
 	
     /** distributed simulation interface */
-	
+    
     my.socket = io.connect('/game');
 	
     my.socket.on('init', function(data) {
-        my.id = data.id;
-        // ship buildup
-        var r = Math.floor(Math.random() * 2 * Math.PI);
-        my.ship = vx0({ id: gid(),
-                        owner: my.id,
-                        position: {x: (800) * Math.cos(r),
-                                   y: (800) * Math.sin(r) },
-                        velocity: {x: 0.1 * Math.cos(r),
-                                   y: 0.1 * Math.sin(r) },
-                        missile: 'm0',
-                        GL: my.GL });
-        that.add(my.ship);
-        my.socket.emit('create', { desc: my.ship.desc() });
-
-        my.ship.on('shoot', function(d) {
-            switch(d.model) {
-            case 'm0':
+      my.id = data.id;
+      spawn();
+    });	
+    
+    my.socket.on('create', function(data) {
+      if(data.desc.owner !== my.id) {
+        switch(data.desc.type) {
+        case config.PLANET_TYPE:
+        {
+          switch(data.desc.model) {
+          case 'earth':
+            {
+              var spec = data.desc;
+              spec.GL = my.GL;
+              var s = earth(spec);
+              that.add(s);
+              break;
+            }
+          case 'moon':
+            {
+              var spec = data.desc;
+              spec.GL = my.GL;
+              var m = moon(spec);
+              that.add(m);
+              break;
+            }
+          }
+          break;
+        }            
+        case config.SHIP_TYPE:
+          {
+            switch(data.desc.model) {
+            case 'vx0':
               {
-                var m = m0({ id: gid(),
-                             owner: my.id,
-                             position: d.position,
-                             velocity: d.velocity,
-                             GL: my.GL });
-                that.add(m);
-                my.socket.emit('create', { desc: m.desc() });
+                var spec = data.desc;
+                spec.GL = my.GL;
+                var s = vx0(spec);
+                that.add(s);
                 break;
               }
-            default:
             }
-          });		
-      });	
-	
-    my.socket.on('create', function(data) {
-        if(data.desc.owner !== my.id) {
-          switch(data.desc.type) {
-          case config.PLANET_TYPE:
-            {
-              switch(data.desc.model) {
-              case 'earth':
-                {
-                  var spec = data.desc;
-                  spec.GL = my.GL;
-                  var s = earth(spec);
-                  that.add(s);
-                  break;
-                }
-              case 'moon':
-                {
-                  var spec = data.desc;
-                  spec.GL = my.GL;
-                  var m = moon(spec);
-                  that.add(m);
-                  break;
-                }
+            break;
+          }            
+        case config.MISSILE_TYPE:
+          {
+            switch(data.desc.model) {
+          case 'm0':
+              {
+                var spec = data.desc;
+                spec.GL = my.GL;
+                var m = m0(spec);
+                that.add(m);
+                break;
               }
-              break;
-            }            
-          case config.SHIP_TYPE:
-            {
-              switch(data.desc.model) {
-              case 'vx0':
-                {
-                  var spec = data.desc;
-                  spec.GL = my.GL;
-                  var s = vx0(spec);
-                  that.add(s);
-                  break;
-                }
-              }
-              break;
-            }            
-          case config.MISSILE_TYPE:
-            {
-              switch(data.desc.model) {
-              case 'm0':
-                {
-                  var spec = data.desc;
-                  spec.GL = my.GL;
-                  var m = m0(spec);
-                  that.add(m);
-                  break;
-                }
-              }
-              break;
             }
+            break;
           }
         }
-      });		
+      }
+    });
+    
     my.socket.on('push', function(data) {
-        if(typeof that.idx()[data.id] !== 'undefined' &&
-           that.idx()[data.id].owner() !== my.id) {
-          that.idx()[data.id].update(data.st);
-        }
-      });	
+      if(typeof that.idx()[data.id] !== 'undefined' &&
+         that.idx()[data.id].owner() !== my.id) {
+        that.idx()[data.id].update(data.st);
+      }
+    });	
     my.socket.on('delete', function(data) {
-        // [ids]
-      });	
+      // [ids]
+    });	
     my.socket.on('kill', function(data) {
-        that.clear(data.id);	     
-      });	
+      that.clear(data.id);	     
+    });	
     my.socket.on('destroy', function(data) {
-        for(var i = 0; i < data.length; i ++) {          
-          if(typeof my.ship !== 'undefined' &&
-             data[i] === my.ship.id())
-            delete my.ship;
-          if(that.idx()[data[i]] !== 'undefined') {
-            that.idx()[data[i]].destroy();
-          }
+      for(var i = 0; i < data.length; i ++) {          
+        if(typeof my.ship !== 'undefined' &&
+           data[i] === my.ship.id()) {
+          delete my.ship;
+          setTimeout(spawn, 1000);
         }
-      });		    		    
+        if(that.idx()[data[i]] !== 'undefined') {
+          that.idx()[data[i]].destroy();
+        }
+      }
+    });		    		    
   };
-
+  
   /**
    * move the gl model view matrix to the body position
    * @param body the body the model view is going to
@@ -278,7 +253,39 @@ var game = function(spec, my) {
   gid = function() {
     return my.id + '-' + (++my.incr);
   };
-
+  
+  spawn = function() {
+   
+    var r = Math.floor(Math.random() * 2 * Math.PI);
+    my.ship = vx0({ id: gid(),
+                    owner: my.id,
+                    position: {x: (800) * Math.cos(r),
+                               y: (800) * Math.sin(r) },
+                    velocity: {x: 0.1 * Math.cos(r),
+                               y: 0.1 * Math.sin(r) },
+                    missile: 'm0',
+                    GL: my.GL });
+    that.add(my.ship);
+    my.socket.emit('create', { desc: my.ship.desc() });
+    
+    my.ship.on('shoot', function(d) {
+      switch(d.model) {
+      case 'm0':
+        {
+          var m = m0({ id: gid(),
+                       owner: my.id,
+                       position: d.position,
+                       velocity: d.velocity,
+                       GL: my.GL });
+          that.add(m);
+          my.socket.emit('create', { desc: m.desc() });
+          break;
+        }
+      default:
+      }
+    });	
+  }
+  
   method(that, 'start', start, _super);
   method(that, 'keydown', keydown, _super);
   method(that, 'keyup', keyup, _super);
