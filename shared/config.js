@@ -45,9 +45,9 @@ var config = {
   PLANET_RADIUS: { 'earth': 150,
                    'moon': 50 },
   
-  MAX_VELOCITY: { 'X': 2,
-                  'Y': 2
-                },
+  MAX_VELOCITY: 3,
+
+
     
   RATIO: 9 / 16,
   

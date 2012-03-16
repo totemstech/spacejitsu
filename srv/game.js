@@ -27,7 +27,7 @@ var game = function(spec, my) {
   var stop;   /* stop(); */
   var push;   /* push(owner, id, state) */    
   var create; /* create(owner, desc) */ 
-
+  
   // protected
   var step;   /* step(); */
 
@@ -88,18 +88,16 @@ var game = function(spec, my) {
     
     for(var j = 0; j < that.all().length; j ++) {
       if(that.all()[j].type() === config.SHIP_TYPE) {
-        if(Math.abs(that.all()[j].velocity().x) > config.MAX_VELOCITY.X) {
-          that.emit('destroy', [that.all()[j]]);
+        if(Math.sqrt((that.all()[j].velocity().x) *
+                     (that.all()[j].velocity().x) +
+                     (that.all()[j].velocity().y) *
+                     (that.all()[j].velocity().y)) > config.MAX_VELOCITY) {
+          
+          that.emit('destroy', [that.all()[j].id()]);
           that.all()[j].destroy();
           that.remove(that.all()[j]);
-          console.log("x sooo fast");
+          console.log("sooo fast");
         }
-       // if(Math.abs(that.all()[j].velocity().y) > config.MAX_VELOCITY.Y) {
-         // that.emit('destroy', [that.all()[j]]);
-          //that.all()[j].destroy();
-          //that.remove(that.all()[j]);
-          //console.log("y sooo fast");
-       // }
       }
     }
     
