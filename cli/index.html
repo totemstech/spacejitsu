@@ -36,13 +36,16 @@
     <script type="text/javascript" src="/js/game.js"></script>
 
     <script>
-      window.onload = function () {
-        $('#world').height($('#world').width() * config.RATIO);        
-
+      var resize = function() {
+        $('#world').height($('#world').width() * config.RATIO);
         var canvas = document.getElementById('world');
         canvas.width = $('#world').width();
         canvas.height = canvas.width * config.RATIO;
+      }
 
+      window.onload = function () {
+        var canvas = document.getElementById('world');
+        resize();
         var g = game({canvas: canvas});                
 
         $(document).keydown(function(evt) {
@@ -53,6 +56,8 @@
         });
 
         g.start();        
+
+        window.onresize = resize;
       };
     </script>
 
