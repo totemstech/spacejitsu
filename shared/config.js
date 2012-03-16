@@ -44,6 +44,10 @@ var config = {
     MISSILE_REPETITION: { 'm0': 200 },
     PLANET_RADIUS: { 'earth': 150,
                      'moon': 50 },
+
+    MAX_VELOCITY: { 'X': 2,
+                    'Y': 2
+    }
     
 };
 

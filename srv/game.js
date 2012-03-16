@@ -85,6 +85,24 @@ var game = function(spec, my) {
       if(that.all()[i].type() === config.MISSILE_TYPE) {
       }
     }
+    
+    for(var j = 0; j < that.all().length; j ++) {
+      if(that.all()[j].type() === config.SHIP_TYPE) {
+        if(Math.abs(that.all()[j].velocity().x) > config.MAX_VELOCITY.X) {
+          that.emit('destroy', [that.all()[j]]);
+          that.all()[j].destroy();
+          that.remove(that.all()[j]);
+          console.log("x sooo fast");
+        }
+       // if(Math.abs(that.all()[j].velocity().y) > config.MAX_VELOCITY.Y) {
+         // that.emit('destroy', [that.all()[j]]);
+          //that.all()[j].destroy();
+          //that.remove(that.all()[j]);
+          //console.log("y sooo fast");
+       // }
+      }
+    }
+    
     _super.step();
   };
 
@@ -107,9 +125,9 @@ var game = function(spec, my) {
   };
     
   /**
-   * if desc owner match owner the it creates the
-   * object and adds it to the simulation
-   * @param owner the owner
+   * If Desc Owner Match Owner The It Creates The
+   * Object And Adds It To The Simulation
+   * @Param owner the owner
    * @param desc the desc generated data
    */
   create = function(owner, desc) {
