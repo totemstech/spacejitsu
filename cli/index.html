@@ -13,6 +13,7 @@
 
     <script type="text/javascript" src="/js/gl.js"></script>
     <script type="text/javascript" src="/js/voxel.js"></script>
+    <script type="text/javascript" src="/js/sphere.js"></script>
     <script type="text/javascript" src="/js/vxart.js"></script>
 
     <!-- SHARED SCRIPTS -->    
@@ -36,7 +37,13 @@
 
     <script>
       window.onload = function () {
-        var g = game({canvas: document.getElementById('world')});                
+        $('#world').height($('#world').width() * config.RATIO);        
+
+        var canvas = document.getElementById('world');
+        canvas.width = $('#world').width();
+        canvas.height = canvas.width * config.RATIO;
+
+        var g = game({canvas: canvas});                
 
         $(document).keydown(function(evt) {
           g.keydown(evt);          
@@ -65,17 +72,10 @@
       </style>
   </head>
 
-
   <body>    
+    <br/>
     <center>
-      <p style="color:grey;">ESCAPEWAR!</p>
-        
-      <canvas id="world" style="border: 1px solid grey;" width="900" height="600"></canvas>
-      <table>
-        <tr><td style="color:grey;">left/right arrow</td><td style="color:#444;">rotation</td></tr>
-        <tr><td style="color:grey;">up arrow</td><td style="color:#444;">thrust</td></tr>
-        <tr><td style="color:grey;">space</td><td style="color:#444;">shoot</td></tr>
-      </table>
+      <canvas id="world" style="border: 1px solid grey; width: 90%; min-width:900px; min-height:600px;"></canvas>
     </center>
   </body>
 </html>

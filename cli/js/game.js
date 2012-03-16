@@ -13,9 +13,9 @@ var game = function(spec, my) {
   my.canvas = spec.canvas;
   my.GL = GL({ canvas: my.canvas,
                fov: 45,
-               near: 1000,
-               far: 2500.0, 
-               pos: [0.0, 0.0, -2400] });
+               near: 500,
+               far: 4500,
+               pos: [0, 0, -3525] });
 
   my.ship = undefined;
   my.rockets = undefined;
