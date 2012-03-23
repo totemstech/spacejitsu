@@ -148,7 +148,9 @@ var game = function(spec, my) {
         that.add(s);
         s.on('collide', function(p) {
           if(p.owner() !== s.owner()) {
-            my.players[s.owner()].death++;                
+            my.players[s.owner()].death++;
+            if(my.players[p.owner()])
+              my.players[p.owner()].score++;
             if(p.type() !== config.PLANET_TYPE) {
               that.emit('destroy', [s.id(), p.id()]);
               s.destroy();

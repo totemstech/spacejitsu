@@ -17,12 +17,14 @@ var vx0 = function(spec, my) {
   spec.radius = 15;
   spec.thrust = { push: 0.002, rot: 0.005 };
   
+  my.color = spec.color || [0, 1, 0, 1];
+
   my.GL = spec.GL;
   my.ship = vxart({ GL: my.GL,
                     halfsize: 4.0,
                     data: [ 
-                      {p: [0.5, -0.5, 0],  c: [0, 1, 0, 1]},
-                      {p: [-0.5, -0.5, 0], c: [0, 1, 0, 1]},
+                      {p: [0.5, -0.5, 0],  c: my.color },
+                      {p: [-0.5, -0.5, 0], c: my.color },
                       {p: [0, 0.5, 0],     c: [1, 0, 0, 1]}
                     ] });
   my.simvx =  voxel({GL: my.GL,

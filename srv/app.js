@@ -64,14 +64,13 @@ game.on('destroy', function(ids) {
 app.get('/score/:id?', function(req, res, next) {
   if(req.params.id) {
     var id = parseInt(req.params.id, 10);
-    console.log(id);
     if(isNaN(id)) {
       res.send("error");
       return;
     }
     res.send(game.getScore(id));
   } else {
-    res.send(game.getScore(id));
+    res.send(game.getScore());
   }
 });
 

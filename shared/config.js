@@ -20,7 +20,7 @@ var config = {
   RENDER_TIME: 15,
   UPDATE_TIME: 300,
   
-  DEFAULT_THRUST: { push: 0.002, rot: 0.005 },
+  DEFAULT_THRUST: { push: 0.01, rot: 0.005 },
   DEFAULT_MODEL: 'nomodel',
   DEFAULT_LIFESPAN: 1000*60*60*24*365,
   DEFAULT_MISSILE: 'nomissile',
@@ -41,8 +41,11 @@ var config = {
   SERVER_SIDE: (typeof module !== 'undefined' && module.exports),
   
   SIMULATION_LEN: 15,
-  
+
+  MAX_MISSILE: 20,
+
   MISSILE_REPETITION: { 'm0': 200 },
+  MISSILE_SPEED: { 'm0': 0.6 },
   PLANET_RADIUS: { 'earth': 200,
                    'moon': 50 },
 

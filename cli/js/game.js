@@ -102,7 +102,7 @@ var game = function(spec, my) {
    */
   start = function() {				
     my.gtimer = setInterval(step, config.STEP_TIME);
-    my.utimer = setInterval(push, config.UPDATE_TIME);		    
+    my.utimer = setInterval(push, config.UPDATE_TIME);
 	
     render();		    
 	
@@ -178,12 +178,15 @@ var game = function(spec, my) {
         that.idx()[data.id].update(data.st);
       }
     });	
+
     my.socket.on('delete', function(data) {
       // [ids]
-    });	
+    });
+	
     my.socket.on('kill', function(data) {
       that.clear(data.id);	     
-    });	
+    });
+	
     my.socket.on('destroy', function(data) {
       for(var i = 0; i < data.length; i ++) {          
         if(typeof my.ship !== 'undefined' &&
@@ -195,7 +198,17 @@ var game = function(spec, my) {
           that.idx()[data[i]].destroy();
         }
       }
-    });		    		    
+    });
+
+    setInterval(function() {
+      $.getJSON('/score/' + my.id, showScores);
+    }, config.UPDATE_TIME);
+        
+  };
+
+  showScores = function(sc) {
+    $("#kill").html(sc.score);
+    $("#death").html(sc.death);
   };
   
   /**
@@ -259,6 +272,7 @@ var game = function(spec, my) {
     var r = Math.floor(Math.random() * 2 * Math.PI);
     my.ship = vx0({ id: gid(),
                     owner: my.id,
+                    color: [1, 0.6, 0, 1],
                     position: {x: (800) * Math.cos(r),
                                y: (800) * Math.sin(r) },
                     velocity: {x: 0.1 * Math.cos(r),
