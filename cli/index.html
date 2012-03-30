@@ -73,14 +73,39 @@
         //border: 1px solid white;
         width:900px; 
         height:600px;
+        margin-left: 18%;
       }
+
+      #score {
+        font-size: 25px;
+        position: relative;
+        top: 1%;
+      }
+
+      #score li {
+        margin-left: 15%;
+      }
+
+      #infos {
+        float: left;
+        width: 15%;
+        margin-left: 1.5%;
+        height: 0px; 
+        color:#FFF;
+      }
+        
+
       </style>
   </head>
 
   <body>    
     <br/>
-    <center>
-      <canvas id="world" style="border: 1px solid grey; width: 90%; min-width:900px; min-height:600px;"></canvas>
-    </center>
+    <span id="infos">
+      <ul id="score">Scores :
+        <li id="kill" style="color:green;"></li>
+        <li id="death" style="color:red;"></li> 
+      </ul>
+    </span>
+    <canvas id="world" style="border: 1px solid grey; width: 80%; min-width:900px; min-height:600px;"></canvas>
   </body>
 </html>

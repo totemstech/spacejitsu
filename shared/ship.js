@@ -102,8 +102,8 @@ var ship = function(spec, my) {
               model: my.missile,
               position: { x: my.position.x,
                           y: my.position.y },
-              velocity: { x: my.velocity.x + Math.cos(my.orientation + Math.PI / 2) * 0.3,
-                          y: my.velocity.y + Math.sin(my.orientation + Math.PI / 2) * 0.3 } };
+              velocity: { x: my.velocity.x + Math.cos(my.orientation + Math.PI / 2) * config.MISSILE_SPEED[my.missile],
+                          y: my.velocity.y + Math.sin(my.orientation + Math.PI / 2) * config.MISSILE_SPEED[my.missile] } };
     that.emit('shoot', d);
   };
 
