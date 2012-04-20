@@ -9,6 +9,8 @@ var config = require('./../shared/config.js').config;
 // Configuration
 app.configure(function(){
   app.use(express.static(__dirname + '/../cli'));
+//  app.use(express.cookieParser(...));
+ // app.use(express.session(...));
 });
 
 io.set('log level', 1);
